@@ -3,6 +3,8 @@ const { DOUBLE } = require('sequelize');
 const { Sequelize } = require('sequelize');
 const db = require('./db');
 
+
+
 const Paciente = db.define('Pacientes', {
     id:{
         type: Sequelize.INTEGER,
@@ -34,6 +36,13 @@ const Paciente = db.define('Pacientes', {
         type: Sequelize.STRING,
         allowNull: false,
     },
+    senha:{
+        type: Sequelize.STRING,
+        allowNull: false,
+
+
+    },
+
     
 });
 //Criar tabela 
