@@ -1,0 +1,49 @@
+body {
+    text-align: center;
+    border: 5px solid black;
+    min-height: 50vh;
+    background-color: rgb(181, 247, 181);
+}
+
+p {
+    font-size: clamp(1em, 1em + 1vw, 1.5em);
+    text-align: left;
+}
+
+.container-calorie {
+    width:96%;
+    margin-bottom: 2%;
+    margin-left: 2%;
+    margin-right: 2%;
+    border: solid transparent;
+    border-radius: 50px;
+    box-sizing: border-box;
+    background-color: rgb(107, 248, 107);
+}
+
+.container-calorie img{
+    width: clamp(10em, 10em + 10vw, 10em);
+    height: clamp(10em, 10em + 10vw, 10em);
+}
+.container-calorie .conteudo{
+    margin: 2%;
+}
+
+.calorie p{
+    width: 70%;
+    float: left;
+    position: relative;
+    text-align: center;
+}
+
+/*
+.inicio{
+    margin-bottom: 200px;
+}*/
+/*
+.container-calorie .elementos{
+    width: clamp(10em, 10em + 10vw, 10em);
+    height: clamp(10em, 10em + 10vw, 10em);
+    float: left;
+    position: relative;
+}*/
