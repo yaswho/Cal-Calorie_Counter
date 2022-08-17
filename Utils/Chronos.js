@@ -1,11 +1,12 @@
-// @ts-nocheck
-const { ToadScheduler, SimpleIntervalJob, Task, Task } = require('toad-scheduler');
+const { v4: uuidv4 } = require('uuid')
+const { ToadScheduler, SimpleIntervalJob, Task } = require('toad-scheduler');
 const { EmailChecker, CheckerFromJson } = require('./TimeModels/EmailChecker');
 var fs = require('fs');
 
 var timeFolder = './timing';
 const emails = {};
 const emailsjson = {};
+const emails_uuid = {};
 
 class Chronos
 {
@@ -22,15 +23,14 @@ class Chronos
     {
         this.schedulers[name] = new ToadScheduler();
 
-        fs.access(timeFolder + `/${name}.json`, fs.F_OK, (err) => {
-            if(err)
-            {
-                fs.writeFile(timeFolder + `/${name}.json`, '', function (err) {
-                    if (err) throw err;
-                    console.log('Created!');
-                  });
-            }
-        })
+        if(!fs.existsSync(timeFolder + `/${name}.json`))
+        {
+            fs.writeFile(timeFolder + `/${name}.json`, '{}', function (err) {
+                if (err) throw err;
+                console.log('Created!');
+            }); 
+        }
+        
     }
 
     // addTask(schedulerName, taskName, timeObject, func, ...params)
@@ -40,33 +40,56 @@ class Chronos
     //     this.schedulers[schedulerName].addSimpleIntervalJob(job);
     // }
 
-    checkEmail(email)
+    checkEmail(email, session)
     {
         var checker;
+        var uuid;
 
         if(emails[email])
         {
             checker = CheckerFromJson(emailsjson[email]);
+            uuid = checker.uuid;
         } else {
-            checker = new EmailChecker(email, 24, 0);
+
+            uuid = generateUUID(emails_uuid);
+            checker = new EmailChecker(email, 24, 0, uuid);
+            emails_uuid[uuid] = { checker: checker, session: session };
             emails[email] = checker;
         }
 
-        const Task = new Task(`check_${email}`, () => {
+        const task = new Task(`check_${email}`, () => {
             delete emails[email];
             delete emailsjson[email];
         });
 
         const job = new SimpleIntervalJob(checker.remainingTime(), task);
-        this.schedulers[schedulerName].addSimpleIntervalJob(job);
+        this.schedulers['emailchecker'].addSimpleIntervalJob(job);
+
+        return uuid;
     }
 
-    hasEmailTime(email)
+    hasEmailTime(uuid)
+    {
+        if(emails_uuid[uuid])
+        {
+            return emails_uuid[uuid].checker.isCompleted();
+        } else return false;
+    }
+
+    getEmailSession(uuid)
+    {
+        if(emails_uuid[uuid])
+        {
+            return emails_uuid[uuid].session;
+        } else return null;
+    }
+
+    isFree(email)
     {
         if(emails[email])
         {
-            return emails[email].isCompleted();
-        } else false;
+            return false;
+        } else return true;
     }
 
     shutdown()
@@ -87,20 +110,31 @@ class Chronos
 
     load()
     {
-        fs.readFile(timeFolder + '/emailcheker.json', 'utf-8', (err, data) => {
+        fs.readFile(timeFolder + '/emailchecker.json', 'utf-8', (err, data) => {
             if (err) {
                 throw err;
             }
-        
+            
+            console.log(data.toString());
             const checkers = JSON.parse(data.toString());
 
             if(Object.keys(checkers) > 0) this.emailsjson = checkers;
         });
     }
+
+    start()
+    {
+        chronos.registerScheduler("emailchecker");
+    }
 }
 
+function generateUUID(obj) {
+    var _uuid = uuidv4();
+    if(!obj[_uuid]) {
+        return _uuid;
+    } else return generateUUID(obj);
+}
 
 const chronos = new Chronos();
-chronos.registerScheduler("emailchecker");
 
 module.exports = chronos;
