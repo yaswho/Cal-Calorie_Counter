@@ -42,9 +42,18 @@ const Paciente = db.define('Pacientes', {
 
 
     },
-
-    
+    //var para pesos antigos
+    peso_anterior:{
+        type: Sequelize.DOUBLE,
+        allowNull: false, 
+    },
+    //var para alturas antigas
+    altura_anterior:{
+        type: Sequelize.DOUBLE,
+        allowNull: false, 
+        } 
 });
+
 //Criar tabela 
 Paciente.sync();
 module.exports = Paciente; 

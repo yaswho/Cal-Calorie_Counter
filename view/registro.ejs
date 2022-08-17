@@ -4,10 +4,10 @@
 
 <h2>HTML Forms</h2>
 
-<form>
+<form action="/api/registrar" method="post">
   <label for="fname">Senha:</label><br>
   <input type="password" id="password" name="password"><br>
-  <label for="lname">Last name:</label><br>
+  <label for="lname">Repita sua senha:</label><br>
   <input type="password"><br><br>
   <input type="hidden" name="session" value="<%= session %>"><br><br>
   <input type="submit" value="Submit">

@@ -49,8 +49,9 @@ class Chronos
         {
             checker = CheckerFromJson(emailsjson[email]);
             uuid = checker.uuid;
+            emails_uuid[uuid] = { checker: checker, session: session };
+            emails[email] = checker;
         } else {
-
             uuid = generateUUID(emails_uuid);
             checker = new EmailChecker(email, 24, 0, uuid);
             emails_uuid[uuid] = { checker: checker, session: session };
@@ -90,6 +91,15 @@ class Chronos
         {
             return false;
         } else return true;
+    }
+
+    freeEmail(uuid)
+    {
+        var email = emails_uuid[uuid].session.email;
+        delete emails[email];
+        delete emails_uuid[uuid];
+
+        if(emailsjson[email]) delete emailsjson[email];
     }
 
     shutdown()

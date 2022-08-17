@@ -1,0 +1,12 @@
+body {
+	background-image: url('imgs/kaoribg.png');
+	background-color: #40B900;
+	background-position: center top;
+    background-size: 100% auto;
+}
+
+#container {
+	background-color: rgba(64, 185, 0, 0.2);
+	background-position: center top;
+    height: 100vh;
+}
