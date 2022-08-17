@@ -36,6 +36,11 @@ p {
     text-align: center;
 }
 
+#contador{
+    text-align: center;
+    font-size: 50px;
+    margin: 2%;
+}
 /*
 .inicio{
     margin-bottom: 200px;

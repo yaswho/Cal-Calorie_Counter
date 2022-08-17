@@ -10,27 +10,29 @@
 </head>
 
 <body>
-    <h2>Calorie Counter</h2>
+    <section>
+        <h2>Calorie Counter</h2>
 
-    <div class="container-calorie">
-        <div class="conteudo">
-            <div class="inicio">
-                <div class="calorie">
-                    <p>Distância percorrida: 7.56 km
-                    </p><br>
-                    <p>Calorias: 399 kcal</p>    
+        <div class="container-calorie">
+            <div class="conteudo">
+                <div class="inicio">
+                    <div class="calorie">
+                        <p>Distância percorrida: 7.56 km
+                        </p><br>
+                        <p>Calorias: 399 kcal</p>
 
+                    </div>
                 </div>
+
+                <div class="logo">
+                    <img src="img/contador.jpg" alt="some text">
+                </div>
+
+
             </div>
 
-            <div class="logo">
-                <img src="img/contador.jpg" alt="some text">
-            </div>
-
-            
         </div>
-
-    </div>
+    </section>
 
     <div class="container-calorie">
         <div class="conteudo">
@@ -49,11 +51,10 @@
             <div class="logo">
                 <img src="img/logo.png" alt="some text">
             </div>
-
+            
             <div class="elementos">
-                <img src="img/logo.png" alt="some text">
-                <img src="img/logo.png" alt="some text">
-                <img src="img/logo.png" alt="some text">
+                <p id="contador">0</p>
+                <button onclick="aumentar()">mais</button>
             </div>
         </div>
     </div>
@@ -81,7 +82,20 @@
         </div>
 
     </div>
+    <script>
+        let numero = 0
 
+        function aumentar(){
+            numero = numero + 1 
+            console.log(numero)
+            render()
+        }
+
+        function render(){
+            const p = document.querySelector("#contador")
+            p.innerText = numero
+        }
+    </script>
 </body>
 
 </html>
