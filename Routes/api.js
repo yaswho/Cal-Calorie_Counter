@@ -123,7 +123,7 @@ router.post('/registrar', async(req, res) => {
 	const psw = bcrypt.hashSync(req.body.password, salt);
 
 	const dt = { ...data, senha: psw };
-	console.log(dt);
+
 	await Paciente.create(dt) //aqui
 		.then(()=> {
 			return res.json({
