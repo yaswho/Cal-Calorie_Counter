@@ -81,12 +81,12 @@ router.get("/calcularIMC", async(req, res)=> {
 		}); 
 
 	if(Object.keys(users).length < 0) {
-			return res.status(400).json({
-				erro: true,
-				mensagem: "Erro: Email não encontrado!"
-			})
-		}
-	const imc = Utils.imc(users[0].dataValues.peso, users[0].dataValues.altura);    
+		return res.status(400).json({
+			erro: true,
+			mensagem: "Erro: Email não encontrado!"
+		})
+	}
+	const imc = utils.imc(users[0].dataValues.peso, users[0].dataValues.altura);    
 	return res.json({
 		imc: imc
 	})       
@@ -121,8 +121,9 @@ router.post('/registrar', async(req, res) => {
 	var data = Chronos.getEmailSession(session);
 	var salt = bcrypt.genSaltSync(13);
 	const psw = bcrypt.hashSync(req.body.password, salt);
+	const _uuid = await utils.generatePacientUUID();
 
-	const dt = { ...data, senha: psw };
+	const dt = { ...data, senha: psw, uuid: _uuid };
 
 	await Paciente.create(dt) //aqui
 		.then(()=> {
@@ -143,14 +144,74 @@ router.post('/registrar', async(req, res) => {
 	Chronos.freeEmail(session);
 })
 
-function verifyJWT(req, res, next){ 
+//Função de login 
+router.post('/login', async(req, res) => {
+
+	console.log(req.body)
+
+	const users = await Paciente.findAll({
+		attributes: ['email', 'uuid', 'senha'],
+		where: {
+			email: req.body.email
+		}
+	}); 
+
+	if(Object.keys(users).length < 0) {
+		return res.status(400).json({
+			erro: true,
+			mensagem: "Erro: Email não encontrado!"
+		})
+	}
+
+	var pass = await bcrypt.compare(req.body.senha, users[0].dataValues.senha);
+
+	if(!pass)
+	{
+		return res.status(400).json({
+			erro: true,
+			mensagem: "Erro: Senha incorreta!"
+		})
+	}
+
+	const token = utils.encrypt(`${users[0].dataValues.email}&${users[0].dataValues.uuid}`, 24*60);
+	utils.setCookie(res, "token", token, 24*60);
+
+	return res.status(200).json({
+		erro: false,
+		mensagem: "Logado com sucesso!"
+	})
+
+});
+
+async function verifyJWT(req, res, next) { 
 	var token = req.headers['x-access-token']; 
+
 	if (!token) 
-		return res.status(401).send({ auth: false, message: 'Token não informado.' }); 
+		return res.status(401).send({ auth: false, message: 'Token não informado ou expirado.' }); 
 	
-	var data = utils.decrypt("a");
-	
+	token = utils.decrypt(token);
+	var data = token.split('&');
+
+	const users = await Paciente.findAll({
+		attributes: ['email', 'uuid'],
+		where: {
+		  uuid: data[1]
+		}
+	}); 
+
+	if(Object.keys(users).length < 0) {
+		return res.status(400).json({
+			erro: true,
+			mensagem: "Erro: Cadastro não encontrado!"
+		})
+	}
+
+	var d_token = `${users[0].dataValues.email}&${users[0].dataValues.uuid}`;
+
+	return (token === d_token);
 }
+
+
 
 //Exportando router
 module.exports= router;

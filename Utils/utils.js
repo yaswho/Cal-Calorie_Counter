@@ -2,6 +2,8 @@ require("dotenv").config();
 const nodemailer = require('nodemailer');
 var fs = require('fs');
 var jwt = require('jsonwebtoken');
+const Paciente = require('../models/Paciente');
+const { v4: uuidv4 } = require('uuid');
 
 //Função para criar transportador 
 const transporter = nodemailer.createTransport({
@@ -91,6 +93,21 @@ class Utils {
 	deleteCookie(res, name)
 	{
 		res.clearCookie(name);
+	}
+
+	async generatePacientUUID()
+	{
+		var _uuid = uuidv4();
+
+		const users = await Paciente.findAll({
+			where: {
+			  uuid: _uuid
+			 }
+		}); 
+			
+		if(Object.keys(users).length > 0) return this.generatePacientUUID();
+
+		return _uuid;
 	}
 
   }

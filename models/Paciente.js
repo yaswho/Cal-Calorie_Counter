@@ -4,7 +4,6 @@ const { Sequelize } = require('sequelize');
 const db = require('./db');
 
 
-
 const Paciente = db.define('Pacientes', {
     id:{
         type: Sequelize.INTEGER,
@@ -14,44 +13,47 @@ const Paciente = db.define('Pacientes', {
     },
     idade:{
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: false
     },
     altura:{
         type: Sequelize.DOUBLE,
-        allowNull: false,     
+        allowNull: false    
     },
     peso:{
         type: Sequelize.DOUBLE,
-        allowNull: false,     
+        allowNull: false    
     },
     nome_paciente:{
         type: Sequelize.STRING,
-        allowNull: false,     
+        allowNull: false     
     },
     email:{
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: false
     },
     sexo:{
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: false
     },
     senha:{
         type: Sequelize.STRING,
-        allowNull: false,
-
-
+        allowNull: false
     },
     //var para pesos antigos
-    peso_anterior:{
-        type: Sequelize.DOUBLE,
-        allowNull: false, 
+    peso_anterior: {
+        type: Sequelize.STRING,
+        allowNull: false
     },
     //var para alturas antigas
-    altura_anterior:{
-        type: Sequelize.DOUBLE,
-        allowNull: false, 
-        } 
+    altura_anterior: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    //Identificador Único Universal de paciente
+    uuid: {
+        type: Sequelize.STRING,
+        allowNull: false
+    }
 });
 
 //Criar tabela 
