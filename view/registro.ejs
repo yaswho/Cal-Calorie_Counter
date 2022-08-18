@@ -1,16 +1,50 @@
-<!DOCTYPE html>
-<html>
-<body>
+<%- include('header', {title: title}); %>
 
-<h2>HTML Forms</h2>
+<nav class="navbar navbar-expand-lg navbar-bg">
+<div class="container-fluid">
+<a class="navbar-brand" href="#">Calorie Counter</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse flex-grow-1 text-right" id="navbarSupportedContent">
+    <ul class="navbar-nav ms-auto flex-nowrap">
+    <li class="nav-item">
+    <a class="nav-link m-2 menu-item" href="/">Home</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link m-2 menu-item" href="#">Sobre Nós</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link m-2 menu-item" href="/site/login">Login</a>
+    </li>
+    </ul>
+</div>
+</div>
+</nav>
+</br>
 
 <form action="/api/registrar" method="post">
-  <label for="fname">Senha:</label><br>
-  <input type="password" id="password" name="password"><br>
-  <label for="lname">Repita sua senha:</label><br>
-  <input type="password"><br><br>
-  <input type="hidden" name="session" value="<%= session %>"><br><br>
-  <input type="submit" value="Submit">
-</form> 
-</body>
-</html> 
+    <h2>Finalizar cadastro</h2>
+    <input type="password" name="password" id="password" class="form-control" placeholder="Senha" aria-label="Senha" required>
+    <input type="password" name="passwordConfirm" id="confirm_password" class="form-control" placeholder="Confirmar senha" aria-label="Confirmar senha" required>
+    <input type="hidden" name="session" value="<%= session %>">
+    <div class="d-grid gap-2"><button type="submit" class="btn btn-primary" style="max-width: 100%;">Enviar</button></div>
+</form>
+
+<script>
+    var password = document.getElementById("password"), 
+        confirm_password = document.getElementById("confirm_password");
+
+    function validatePassword(){
+    if(password.value != confirm_password.value) {
+            confirm_password.setCustomValidity("As senhas não coincidem.");
+        } else {
+            confirm_password.setCustomValidity('');
+        }
+    }
+
+    password.onchange = validatePassword;
+    confirm_password.onkeyup = validatePassword;
+</script>
+
+<%- include('footer'); %>

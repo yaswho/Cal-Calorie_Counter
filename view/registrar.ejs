@@ -1,0 +1,62 @@
+<%- include('header', {title: title}); %>
+<nav class="navbar navbar-expand-lg navbar-bg">
+<div class="container-fluid">
+<a class="navbar-brand" href="#">Calorie Counter</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+  <span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse flex-grow-1 text-right" id="navbarSupportedContent">
+  <ul class="navbar-nav ms-auto flex-nowrap">
+  <li class="nav-item">
+    <a class="nav-link m-2 menu-item" href="/">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link m-2 menu-item" href="#">Sobre Nós</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link m-2 menu-item" href="/site/login">Login</a>
+    </li>
+  </ul>
+</div>
+</div>
+</nav>
+</br>
+<div class="row">
+<div class="offset-md-4 col-md-4 col-sm-12">
+  <form action="/api/registrarPaciente" method="post">
+      <h1 style="padding-top:10px;padding-bottom:10px;">Cadastre-se:</h1>
+      <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1"><img src="/bootstrap-icons-1.9.0/person-badge.svg"></span>
+          <input type="text" name="nome_paciente" class="form-control" placeholder="Nome" aria-label="Nome" aria-describedby="basic-addon1" required>
+      </div>
+      <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1"><img src="/bootstrap-icons-1.9.0/mailbox.svg"></span>
+          <input type="email" name="email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1" required>
+      </div>
+      <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1"><img src="/bootstrap-icons-1.9.0/person.svg"></span>
+          <input type="number" name="idade" class="form-control" placeholder="Idade" aria-label="Idade" aria-describedby="basic-addon1" required>
+      </div>
+      <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1"><img src="/bootstrap-icons-1.9.0/123.svg"></span>
+          <input type="number" name="altura" step="0.01" class="form-control" placeholder="Altura (metros)" aria-label="Altura" aria-describedby="basic-addon1" required>
+      </div>
+      <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1"><img src="/bootstrap-icons-1.9.0/123.svg"></span>
+          <input type="number" name="peso" class="form-control" placeholder="Peso (Kg)" aria-label="Peso" aria-describedby="basic-addon1" required>
+      </div>
+      <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1"><img src="/bootstrap-icons-1.9.0/gender-ambiguous.svg"></span>
+          <select name="sexo" class="form-select" aria-label="Default select example" required>
+              <option selected value="M">Escolha uma opção</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+          </select>
+      </div>
+      <input type="hidden" name="peso_anterior" value="{}">
+      <input type="hidden" name="altura_anterior" value="{}">
+      <div class="d-grid gap-2"><button type="submit" class="btn btn-primary" style="max-width: 100%;">Enviar</button></div>
+  </form>
+</div>
+</div>
+<%- include('footer'); %>

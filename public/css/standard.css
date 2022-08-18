@@ -1,12 +1,101 @@
-body {
-	background-image: url('imgs/kaoribg.png');
-	background-color: #40B900;
-	background-position: center top;
-    background-size: 100% auto;
+@media (min-width: 992px) {
+  .carousel-item img {
+    max-width: 900px;
+    max-height: 600px;
+    width: auto;
+    height: auto;
+  }
+}
+.profile {
+  max-width: 250px;
+  max-height: 250px;
 }
 
-#container {
-	background-color: rgba(64, 185, 0, 0.2);
-	background-position: center top;
-    height: 100vh;
+.icon {
+  max-width: 75px;
 }
+
+.btn-primary {
+  background-color: rgb(71, 159, 118);
+}
+
+.meet-us {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+  background-color: rgb(197, 179, 230);
+}
+@media (min-width: 992px) {
+  .meet-us {
+    padding-left: 8rem;
+    padding-right: 8rem;
+  }
+}
+@media (max-width: 991.98px) {
+  .meet-us {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+.navbar {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.navbar .navbar-nav {
+  font-size: 1.4rem;
+}
+.navbar .nav-item {
+  height: 100%;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  border-radius: 0;
+  color: rgb(15, 81, 50);
+}
+.navbar .nav-item:hover {
+  background-color: rgb(26, 161, 121);
+  color: rgb(111, 66, 193);
+  height: 100%;
+}
+.navbar .navbar-collapse {
+  float: right;
+  right: 10%;
+  align-items: flex-end;
+}
+@media (max-width: 991.98px) {
+  .navbar {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+@media (min-width: 992px) {
+  .navbar {
+    padding-left: 12rem;
+    padding-right: 12rem;
+  }
+}
+
+.navbar-bg {
+  background-color: rgb(166, 233, 213);
+}
+
+.bd-callout {
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.bd-callout h4 {
+  margin-bottom: 0.25rem;
+}
+
+.bd-callout > :last-child {
+  margin-bottom: 0;
+}
+
+.bd-callout + .bd-callout {
+  margin-top: -0.25rem;
+}
+
+.bd-callout .highlight {
+  background-color: rgba(0, 0, 0, 0.05);
+}/*# sourceMappingURL=standard.css.map */

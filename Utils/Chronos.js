@@ -95,7 +95,7 @@ class Chronos
 
     freeEmail(uuid)
     {
-        var email = emails_uuid[uuid].session.email;
+        var email = emails_uuid[uuid]['session']['email'];
         delete emails[email];
         delete emails_uuid[uuid];
 

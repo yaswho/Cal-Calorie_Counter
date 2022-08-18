@@ -13,6 +13,7 @@ const Chronos = require('./Utils/Chronos.js');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');  
 const helmet = require("helmet");
+const utils = require("./Utils/utils");
 
 app.use(express.json());
 app.use(cors());
@@ -21,15 +22,16 @@ app.use(bodyParser.json());
 app.use(helmet());
 app.use(cookieParser());
 
+app.use(express.static("./public"));
 app.set('view engine', 'ejs');
 app.set('views', './view')
-app.use(express.static("./public"));
 
 //Rotas 
 app.use('/api', api)
 app.use('/site', site)
 
-//Função para criar transportador 
+
+//Função para criar transportador  
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {

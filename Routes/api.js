@@ -94,25 +94,27 @@ router.get("/calcularIMC", async(req, res)=> {
 });
 
 //Função para inserir novos valores de altura e peso 
-// router.post("/update", async(req, res)=> {
-	
-// 	const users = await Paciente.findAll({
-// 		attributes: ['peso', 'altura'],
-// 		where: {
-// 		  email: req.body.email
-// 		 }
-// 		}); 
+/*router.get("/update", async(req, res)=> {
+		
+	 const users = await Paciente.findAll({
+		attributes: ['peso', 'altura'],
+		where: {
+		  email: req.body.email
+		 }
+		}); 
 
-// 	if(Object.keys(users).length < 0) {
-// 			return res.status(400).json({
-// 				erro: true,
-// 				mensagem: "Erro: Email não encontrado!"
-// 			})
-// 		}
-// 	users.altura_anterior;
-// 	await users.save();
-   	
-// });
+	if(Object.keys(users).length < 0) {
+			return res.status(400).json({
+				erro: true,
+				mensagem: "Erro: Email não encontrado!"
+			})
+		}
+	const altura = Utils.altura(users[0].dataValues.altura); 
+	return res.json({
+		altura: altura
+	})       
+	});*/
+
 
 router.post('/registrar', async(req, res) => {
 	var session = utils.decrypt(req.body.session);
@@ -121,7 +123,7 @@ router.post('/registrar', async(req, res) => {
 	const psw = bcrypt.hashSync(req.body.password, salt);
 
 	const dt = { ...data, senha: psw };
-
+	console.log(dt);
 	await Paciente.create(dt) //aqui
 		.then(()=> {
 			return res.json({
@@ -130,6 +132,7 @@ router.post('/registrar', async(req, res) => {
 			})
 
 		}).catch((err) => {
+			console.log(err);
 			return res.status(400).json({
 				erro: true,
 				mensagem: "Erro: Paciente não cadastrado!"

@@ -44,9 +44,12 @@ class Utils {
 	  pontos = (peso - novopeso) * 5;
 	  return pontos
 	}
-	/*
-	updateAltura(altura){
-		altura_anterior  = 
+	/*updateAltura(altura){
+
+		console.log(altura);
+ 		users.altura = 170;
+ 		users.save();
+		
 	}*/
 
 	encrypt(data, timeInMinutes)
@@ -63,7 +66,8 @@ class Utils {
 	decrypt(data)
 	{
 	  var publicKey  = fs.readFileSync(`${__dirname}/private/public.pem`, {encoding: 'utf8', flag:'r'});
-	  return (jwt.verify(data, publicKey, {algorithm: ["RS256"]})).data; 
+	  var decoded = jwt.verify(data, publicKey, {algorithm: ["RS256"]});
+	  return decoded.data; 
 	}
 
 	setCookie(res, name, data, timeInMinutes)
