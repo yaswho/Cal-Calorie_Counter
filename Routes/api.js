@@ -19,14 +19,24 @@ router.post("/registrarPaciente", async(req, res)=> {
 		}); 
 		
 	if(Object.keys(users).length > 0) {
-		return res.status(400).json({
-				erro: true,
-				mensagem: "Erro: Email já cadastrado!"
-			})
-		}
+		res.render('feedback', {
+			title: "Cal - Feedback",
+			feedback_title: "Erro ao cadastrar",
+			feedback: "Erro ao cadastrar.",
+			color: "error-1",
+			img: "error.png"
+		});
+	}
 
 	if(!Chronos.isFree(req.body.email))
 	{
+		res.render('feedback', {
+			title: "Cal - Feedback",
+			feedback_title: "Erro ao cadastrar",
+			feedback: `O email de confirmação já foi enviado para este o endereço ${req.body.email}.`,
+			color: "error-1",
+			img: "error.png"
+		});
 		return res.status(400).json({
 			erro: true,
 			mensagem: `Erro: Já enviamos o email de confirmação para o endereço ${req.body.email}.`
@@ -34,7 +44,7 @@ router.post("/registrarPaciente", async(req, res)=> {
 	}
 	
 	var uuid = Chronos.checkEmail(req.body.email, req.body);
-	console.log(`UUID: ${uuid}`);
+
 	utils.sendEmail(
 		req.body.email,
 		`<div style="padding: 5px; background-color: rgb(231, 231, 231); margin: 0px;">
@@ -49,25 +59,14 @@ router.post("/registrarPaciente", async(req, res)=> {
 		"Confirme seu cadastro."
 	)
 
-	return res.json({
-		erro: false,
-		mensagem: "Vá para o email!"
-	})
+	res.render('feedback', {
+		title: "Cal - Feedback",
+		feedback_title: "Sucesso!",
+		feedback: "Siga para seu email para terminar o seu registro.",
+		color: "success-1",
+		img: "success.jpg"
+	});
 
-	/*await Paciente.create(req.body) //aqui
-	.then(()=> {
-		return res.json({
-			erro: false,
-			mensagem: "Paciente cadastrado com sucesso!"
-		})
-
-	}).catch(() => {
-		return res.status(400).json({
-			erro: true,
-			mensagem: "Erro: Paciente não cadastrado!"
-		})
-
-	});*/
 });
 
 //Função para calcular IMC
@@ -127,18 +126,23 @@ router.post('/registrar', async(req, res) => {
 
 	await Paciente.create(dt) //aqui
 		.then(()=> {
-			return res.json({
-				erro: false,
-				mensagem: "Paciente cadastrado com sucesso!"
-			})
+			
+			res.render('feedback', {
+				title: "Cal - Feedback",
+				feedback_title: "Sucesso!",
+				feedback: "Paciente cadastrado com sucesso.",
+				color: "success-1",
+				img: "success.jpg"
+			});
 
 		}).catch((err) => {
-			console.log(err);
-			return res.status(400).json({
-				erro: true,
-				mensagem: "Erro: Paciente não cadastrado!"
-			})
-
+			res.render('feedback', {
+				title: "Cal - Feedback",
+				feedback_title: "Erro ao cadastrar",
+				feedback: "Erro ao cadastrar.",
+				color: "error-1",
+				img: "error.png"
+			});
 		});
 
 	Chronos.freeEmail(session);
@@ -146,8 +150,6 @@ router.post('/registrar', async(req, res) => {
 
 //Função de login 
 router.post('/login', async(req, res) => {
-
-	console.log(req.body)
 
 	const users = await Paciente.findAll({
 		attributes: ['email', 'uuid', 'senha'],
@@ -157,20 +159,26 @@ router.post('/login', async(req, res) => {
 	}); 
 
 	if(Object.keys(users).length < 0) {
-		return res.status(400).json({
-			erro: true,
-			mensagem: "Erro: Email não encontrado!"
-		})
+		res.render('feedback', {
+			title: "Cal - Feedback",
+			feedback_title: "Erro ao entrar.",
+			feedback: "Email não encontrado no sistema.",
+			color: "error-1",
+			img: "error.png"
+		});
 	}
 
 	var pass = await bcrypt.compare(req.body.senha, users[0].dataValues.senha);
 
 	if(!pass)
 	{
-		return res.status(400).json({
-			erro: true,
-			mensagem: "Erro: Senha incorreta!"
-		})
+		res.render('feedback', {
+			title: "Cal - Feedback",
+			feedback_title: "Erro ao entrar.",
+			feedback: "Senha incorreta.",
+			color: "error-1",
+			img: "error.png"
+		});
 	}
 
 	const token = utils.encrypt(`${users[0].dataValues.email}&${users[0].dataValues.uuid}`, 24*60);
@@ -181,6 +189,12 @@ router.post('/login', async(req, res) => {
 		mensagem: "Logado com sucesso!"
 	})
 
+});
+
+//Função de login 
+router.post('/login', verifyJWT, async(req, res, next) => {
+	utils.deleteCookie(res, 'token');
+	//sucesso
 });
 
 async function verifyJWT(req, res, next) { 

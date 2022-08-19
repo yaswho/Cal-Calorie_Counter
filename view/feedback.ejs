@@ -1,0 +1,16 @@
+<%- include('header', {title: title}); %>
+<%- include('navbar'); %>
+
+</br>
+
+<div class="row">
+    <div class="offset-md-4 col-md-4 offset-sm-2 col-sm-8">
+        <% if(img) { %>
+            <img src="/img/<%= img %>">
+        <% } %>
+        <h2 class="<%= color %>-text"><%= feedback_title %></h2>
+        <p><%= feedback %></p>
+    </div>
+</div>
+
+<%- include('footer'); %>

@@ -19,6 +19,54 @@
   background-color: rgb(71, 159, 118);
 }
 
+.success-1 {
+  background-color: rgb(77, 212, 172);
+}
+
+.success-1-text {
+  color: rgb(77, 212, 172);
+}
+
+.success-2 {
+  background-color: rgb(32, 201, 151);
+}
+
+.success-2-text {
+  color: rgb(32, 201, 151);
+}
+
+.success-3 {
+  background-color: rgb(26, 161, 121);
+}
+
+.success-3-text {
+  color: rgb(26, 161, 121);
+}
+
+.error-1 {
+  background-color: rgb(227, 93, 106);
+}
+
+.error-1-text {
+  color: rgb(227, 93, 106);
+}
+
+.error-2 {
+  background-color: rgb(220, 53, 69);
+}
+
+.error-2-text {
+  color: rgb(220, 53, 69);
+}
+
+.error-3 {
+  background-color: rgb(176, 42, 55);
+}
+
+.error-3-text {
+  color: rgb(176, 42, 55);
+}
+
 .meet-us {
   padding-top: 4rem;
   padding-bottom: 4rem;
@@ -76,6 +124,10 @@
 
 .navbar-bg {
   background-color: rgb(166, 233, 213);
+}
+
+.white-svg {
+  filter: invert(99%) sepia(84%) saturate(2%) hue-rotate(124deg) brightness(112%) contrast(100%);
 }
 
 .bd-callout {
