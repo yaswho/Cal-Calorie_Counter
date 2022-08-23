@@ -22,7 +22,8 @@ router.get('/login', async (req,res)=>{
 
 	if(utils.hasCookie(req, "token"))
 	{
-		res.redirect('../site/perfil');
+		res.redirect('/perfil');
+		return;		
 	}
 	res.render("login", {
         title: "Cal - Login"
@@ -62,6 +63,7 @@ router.get('/perfil', async (req,res)=> {
 		imc: imc 
 
     });
+
 })
 
 router.get('/pontos', (req,res)=>{

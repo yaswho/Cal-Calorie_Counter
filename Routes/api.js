@@ -71,7 +71,7 @@ router.post("/registrarPaciente", async(req, res)=> {
 
 
 //Função para inserir novos valores de altura e peso 
-/*router.get("/update", async(req, res)=> {
+/*router.post("/update", async(req, res)=> {
 		
 	 const users = await Paciente.findAll({
 		attributes: ['peso', 'altura'],
@@ -144,6 +144,8 @@ router.post('/login', async(req, res) => {
 			color: "error-1",
 			img: "error.png"
 		});
+
+		return;
 	}
 
 	var pass = await bcrypt.compare(req.body.senha, users[0].dataValues.senha);
@@ -157,6 +159,7 @@ router.post('/login', async(req, res) => {
 			color: "error-1",
 			img: "error.png"
 		});
+		return;
 	}
 
 	const token = utils.encrypt(`${users[0].dataValues.email}&${users[0].dataValues.uuid}`, 24*60);

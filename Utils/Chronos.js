@@ -8,6 +8,8 @@ const emails = {};
 const emailsjson = {};
 const emails_uuid = {};
 
+//TODO: otimização
+
 class Chronos
 {
     constructor()
