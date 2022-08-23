@@ -75,16 +75,16 @@ class Utils {
 	setCookie(res, name, data, timeInMinutes)
 	{
 		res.cookie(name, data, {
-		  maxAge: timeInMinutes * 6000,
+		  maxAge: timeInMinutes * 6000, // maxAge:0 => sessão
 		  //secure: true,
 		  httpOnly: true,
 		  sameSite: 'lax'
 	  });
 	}
 
-	hasCookie(res, name)
+	hasCookie(req, name)
 	{
-		if(Object.keys(res.cookies)[name])
+		if(Object.keys(req.cookies)[name])
 		{
 			return true;
 		} else return false;
@@ -108,6 +108,12 @@ class Utils {
 		if(Object.keys(users).length > 0) return this.generatePacientUUID();
 
 		return _uuid;
+	}
+
+	getUUIDFromToken(token)
+	{
+		var dec = utils.decrypt(token);
+		return dec.split('&')[1];
 	}
 
   }

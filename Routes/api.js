@@ -69,28 +69,6 @@ router.post("/registrarPaciente", async(req, res)=> {
 
 });
 
-//Função para calcular IMC
-router.get("/calcularIMC", async(req, res)=> {
-	
-	const users = await Paciente.findAll({
-		attributes: ['peso', 'altura'],
-		where: {
-		  email: req.body.email
-		 }
-		}); 
-
-	if(Object.keys(users).length < 0) {
-		return res.status(400).json({
-			erro: true,
-			mensagem: "Erro: Email não encontrado!"
-		})
-	}
-	const imc = utils.imc(users[0].dataValues.peso, users[0].dataValues.altura);    
-	return res.json({
-		imc: imc
-	})       
-	
-});
 
 //Função para inserir novos valores de altura e peso 
 /*router.get("/update", async(req, res)=> {
@@ -184,15 +162,11 @@ router.post('/login', async(req, res) => {
 	const token = utils.encrypt(`${users[0].dataValues.email}&${users[0].dataValues.uuid}`, 24*60);
 	utils.setCookie(res, "token", token, 24*60);
 
-	return res.status(200).json({
-		erro: false,
-		mensagem: "Logado com sucesso!"
-	})
-
+	res.redirect('../site/perfil');
 });
 
 //Função de login 
-router.post('/login', verifyJWT, async(req, res, next) => {
+router.post('/logout', verifyJWT, async(req, res, next) => {
 	utils.deleteCookie(res, 'token');
 	//sucesso
 });
@@ -224,6 +198,15 @@ async function verifyJWT(req, res, next) {
 
 	return (token === d_token);
 }
+
+//funnção para mostrar os dados do banco 
+router.get('/teste', async(req, res) => {
+	
+	Paciente.findAll().then(function(infos){
+		res.render('teste', {infos: infos});
+	}) 
+		
+})
 
 
 

@@ -2,38 +2,49 @@
 <%- include('navbar') %>
 </br>
 <h1>Informações do Usuário </h1>
+
 <div class="row">
     <div class="offset-md-4 col-md-4 col-sm-12">
         <div class="card mb-3" style="max-width: 540px;padding: 16px;">
+            <h5 class="card-title">Perfil do usuário</h5>
             <div class="row g-0" style="">
                 <div class="col-md-4 col-sm-12">
                 <img src="/imgs/poc1.png" class="img-fluid rounded-start" alt="...">
                 </div>
                 <div class="col-md-8 col-sm-12">
                     <div class="card-body">
-                        <h5 class="card-title">Nome do usuário</h5>
                         <div class="input-group mb-3">
                             <span class="input-group-text" id="basic-addon1"><img src="/bootstrap-icons-1.9.0/person-badge.svg"></span>
-                            <input type="text" name="nome_paciente" class="form-control" placeholder="Yasmim" aria-label="Nome" aria-describedby="basic-addon1" disabled>
+                            <input type="text" name="nome_paciente" class="form-control" placeholder="<%= name %>" aria-label="Nome" aria-describedby="basic-addon1" disabled>
                         </div>
                         <div class = "input-group mb-3">
                             <span class="input-group-text" id="basic-addon1"><img src="/bootstrap-icons-1.9.0/123.svg"></span>
-                            <input type="number" name="altura" step="0.01" class="form-control" placeholder="Altura (metros)" aria-label="Altura" aria-describedby="basic-addon1" disabled>
+                            <input type="number" name="altura" step="0.01" class="form-control" placeholder="<%= altura %> m"aria-label="Altura" aria-describedby="basic-addon1" disabled>
                         </div>   
                         <div class="input-group mb-3">
                             <span class="input-group-text" id="basic-addon1"><img src="/bootstrap-icons-1.9.0/123.svg"></span>
-                            <input type="number" name="peso" class="form-control" placeholder="Peso (Kg)" aria-label="Peso" aria-describedby="basic-addon1" disabled>
+                            <input type="number" name="peso" class="form-control" placeholder="<%= peso %> kg" aria-label="Peso" aria-describedby="basic-addon1" disabled>
                         </div>
-                            
-                            <p class="card-text">Yaya é doida, poc e sofrida</p>
-                            <p class="card-text"><small class="text-muted">Last updated when Jesus want</small></p>
-                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">IMC</span>
+                            <input type="number" name="imc" class="form-control" placeholder="<%= imc %>" aria-label="IMC" aria-describedby="basic-addon1" disabled>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </div>    
+    </div> 
 </div>
 
+<div class="row">
+    <div class="offset-md-4 col-md-4 col-sm-12">
+        <select class="name_update" aria-label="Default select example">
+            <option selected>Selecione o campo a ser alterado</option>
+            <option value="1">Nome</option>
+            <option value="2">Altura</option>
+            <option value="3">Peso</option>
+        </select>
+    </div>
+    
+</div>
 
 <%- include('footer'); %>
