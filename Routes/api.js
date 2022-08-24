@@ -168,39 +168,11 @@ router.post('/login', async(req, res) => {
 	res.redirect('../site/perfil');
 });
 
-//Função de login 
-router.post('/logout', verifyJWT, async(req, res, next) => {
+//Função de logout 
+router.post('/logout', async(req, res, next) => {
 	utils.deleteCookie(res, 'token');
 	//sucesso
 });
-
-async function verifyJWT(req, res, next) { 
-	var token = req.headers['x-access-token']; 
-
-	if (!token) 
-		return res.status(401).send({ auth: false, message: 'Token não informado ou expirado.' }); 
-	
-	token = utils.decrypt(token);
-	var data = token.split('&');
-
-	const users = await Paciente.findAll({
-		attributes: ['email', 'uuid'],
-		where: {
-		  uuid: data[1]
-		}
-	}); 
-
-	if(Object.keys(users).length < 0) {
-		return res.status(400).json({
-			erro: true,
-			mensagem: "Erro: Cadastro não encontrado!"
-		})
-	}
-
-	var d_token = `${users[0].dataValues.email}&${users[0].dataValues.uuid}`;
-
-	return (token === d_token);
-}
 
 //funnção para mostrar os dados do banco 
 router.get('/teste', async(req, res) => {
@@ -209,9 +181,91 @@ router.get('/teste', async(req, res) => {
 		res.render('teste', {infos: infos});
 	}) 
 		
-})
+});
 
+router.post('/atualizarDados', async(req, res, next) => {
+	const users = await Paciente.findAll({
+		attributes: ['peso', 'altura', 'nome_paciente', 'peso_anterior', 'altura_anterior'],
+		where: {
+		  uuid: utils.getUUIDFromToken(req.cookies.token)
+		 }
+		}); 
 
+	var tipo = (Number.isInteger(req.body.update)) ? req.body.update : parseInt(req.body.update);
+
+	if(tipo == 1)
+	{
+		await Paciente.update({ nome_paciente: req.body.update_name }, {
+			where: {
+				uuid: utils.getUUIDFromToken(req.cookies.token)
+			}
+		});
+
+		res.render('feedback', {
+			title: "Cal - Feedback",
+			feedback_title: "Sucesso.",
+			feedback: "Atualizado.",
+			color: "success-1",
+			img: "success.jpg"
+		});
+		return;
+
+	} else if(tipo == 2) {
+		var alturas = users[0].dataValues.altura_anterior;
+
+		alturas[alturas.length] = {
+			altura: users[0].dataValues.altura,
+			data: new Date().toLocaleDateString()
+		}
+
+		await Paciente.update({ altura: req.body.update_altura, altura_anterior: alturas }, {
+			where: {
+				uuid: utils.getUUIDFromToken(req.cookies.token)
+			}
+		});
+
+		res.render('feedback', {
+			title: "Cal - Feedback",
+			feedback_title: "Sucesso.",
+			feedback: "Atualizado.",
+			color: "success-1",
+			img: "success.jpg"
+		});
+		return;
+
+	} else if(tipo == 3) {
+		var pesos = users[0].dataValues.peso_anterior;
+
+		pesos[pesos.length] = {
+			peso: users[0].dataValues.peso,
+			data: new Date().toLocaleDateString()
+		}
+
+		await Paciente.update({ peso: req.body.update_peso, peso_anterior: pesos }, {
+			where: {
+				uuid: utils.getUUIDFromToken(req.cookies.token)
+			}
+		});
+
+		res.render('feedback', {
+			title: "Cal - Feedback",
+			feedback_title: "Sucesso.",
+			feedback: "Atualizado.",
+			color: "success-1",
+			img: "success.jpg"
+		});
+		return;
+	} else {
+		res.render('feedback', {
+			title: "Cal - Feedback",
+			feedback_title: "Erro ao atualizar.",
+			feedback: "Não foi encontrado tipo de dado.",
+			color: "error-1",
+			img: "error.png"
+		});
+		return;
+	}
+});
 
 //Exportando router
 module.exports= router;

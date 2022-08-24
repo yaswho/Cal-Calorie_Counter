@@ -115,6 +115,34 @@ class Utils {
 		var dec = utils.decrypt(token);
 		return dec.split('&')[1];
 	}
+	
+	async verifyJWT(req, res, next) { 
+		var token = req.headers['x-access-token']; 
+	
+		if (!token) 
+			return res.status(401).send({ auth: false, message: 'Token não informado ou expirado.' }); 
+		
+		token = utils.decrypt(token);
+		var data = token.split('&');
+	
+		const users = await Paciente.findAll({
+			attributes: ['email', 'uuid'],
+			where: {
+			  uuid: data[1]
+			}
+		}); 
+	
+		if(Object.keys(users).length < 0) {
+			return res.status(400).json({
+				erro: true,
+				mensagem: "Erro: Cadastro não encontrado!"
+			})
+		}
+	
+		var d_token = `${users[0].dataValues.email}&${users[0].dataValues.uuid}`;
+	
+		return (token === d_token);
+	}
 
   }
 

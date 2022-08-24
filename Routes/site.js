@@ -4,6 +4,8 @@ const utils = require('./../Utils/utils');
 const Paciente = require('../models/Paciente');
 const Chronos = require('./../Utils/Chronos');
 
+//TODO: rota /feedback
+
 router.get('/', (req,res)=>{
 
 	res.render("index", {
@@ -30,7 +32,7 @@ router.get('/login', async (req,res)=>{
     });
 })
 
-router.get('/perfil', async (req,res)=> {
+router.get('/perfil', async (req, res, next)=> {
 
 	if(utils.hasCookie(req, "token"))
 	{
@@ -64,9 +66,11 @@ router.get('/perfil', async (req,res)=> {
 
     });
 
+	//res.redirect('../site/pontos');
+
 })
 
-router.get('/pontos', (req,res)=>{
+router.get('/pontos', utils.verifyJWT, (req, res, next)=>{
 
 	res.render("pontos", {
         title: "Cal - Pontos"
