@@ -2,11 +2,9 @@ const express = require('express');
 const router = express.Router();
 const utils = require('./../Utils/utils');
 const Paciente = require('../models/Paciente');
-const Chronos = require('./../Utils/Chronos');
+const Chronos = require('./../Utils/Chronos'); 
 
-//TODO: rota /feedback
-
-router.get('/', (req,res)=>{
+router.get('/', (req,res) => {
 
 	res.render("index", {
         title: "Cal - Página Inicial"
@@ -32,18 +30,18 @@ router.get('/login', async (req,res)=>{
     });
 })
 
-router.get('/perfil', async (req, res, next)=> {
+router.get('/perfil', utils.verifyJWT, async (req, res, next)=> {
 
 	if(utils.hasCookie(req, "token"))
 	{
-		res.render('feedback', {
-			title: "Cal - Feedback",
-			feedback_title: "Token não encontrado",
-			feedback: "Favor logar novamente.",
-			color: "error-1",
-			img: "error.png"
-		});
 
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Token não encontrado.",
+			"Favor logar novamente.",
+			"error-1",
+			"error.png");
+
+		res.redirect(query);
 		return;
 	}
 
@@ -70,7 +68,8 @@ router.get('/perfil', async (req, res, next)=> {
 
 })
 
-router.get('/pontos', utils.verifyJWT, (req, res, next)=>{
+
+router.get('/pontos', utils.verifyJWT, async(req, res, next)=>{
 
 	res.render("pontos", {
         title: "Cal - Pontos"
@@ -81,15 +80,21 @@ router.get('/registro/:authId',(req,res) =>{
 
 	if(Chronos.hasEmailTime(utils.decrypt(req.params.authId)))
 	{
-		res.render('feedback', {
-			title: "Cal - Feedback",
-			feedback_title: "Erro ao cadastrar",
-			feedback: "Requisite outra chave de segurança preenchendo o formulário de cadastro novamente.",
-			color: "error-1",
-			img: "error.png"
-		});
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Erro ao cadastrar",
+			"Requisite outra chave de segurança preenchendo o formulário de cadastro novamente.",
+			"error-1",
+			"error.png");
+
+		res.redirect(query);
+
 	} else res.render('registro', { title: "Cal - Finalize o registro", session: req.params.authId });
 
+});
+
+router.get('/feedback', async(req, res, next) => {
+	const feedback = JSON.parse(utils.decrypt(req.query.r));
+	res.render('feedback', {...feedback});
 })
 
 module.exports = router;

@@ -19,28 +19,26 @@ router.post("/registrarPaciente", async(req, res)=> {
 		}); 
 		
 	if(Object.keys(users).length > 0) {
-		res.render('feedback', {
-			title: "Cal - Feedback",
-			feedback_title: "Erro ao cadastrar",
-			feedback: "Erro ao cadastrar.",
-			color: "error-1",
-			img: "error.png"
-		});
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Erro ao cadastrar",
+			`Erro ao cadastra`,
+			"error-1",
+			"error.png");
+
+		res.redirect(query);
+		return;
 	}
 
 	if(!Chronos.isFree(req.body.email))
 	{
-		res.render('feedback', {
-			title: "Cal - Feedback",
-			feedback_title: "Erro ao cadastrar",
-			feedback: `O email de confirmação já foi enviado para este o endereço ${req.body.email}.`,
-			color: "error-1",
-			img: "error.png"
-		});
-		return res.status(400).json({
-			erro: true,
-			mensagem: `Erro: Já enviamos o email de confirmação para o endereço ${req.body.email}.`
-		})
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Erro ao cadastrar",
+			`O email de confirmação já foi enviado para este o endereço ${req.body.email}.`,
+			"error-1",
+			"error.png");
+
+		res.redirect(query);
+		return;
 	}
 	
 	var uuid = Chronos.checkEmail(req.body.email, req.body);
@@ -59,22 +57,22 @@ router.post("/registrarPaciente", async(req, res)=> {
 		"Confirme seu cadastro."
 	)
 
-	res.render('feedback', {
-		title: "Cal - Feedback",
-		feedback_title: "Sucesso!",
-		feedback: "Siga para seu email para terminar o seu registro.",
-		color: "success-1",
-		img: "success.jpg"
-	});
+	const query = utils.createURLFeedback("Cal - Feedback",
+		"Sucesso!",
+		"Siga para seu email para terminar o seu registro.",
+		"success-1",
+		"success.png");
+
+	res.redirect(query);
+	return;
 
 });
 
 
 //Função para inserir novos valores de altura e peso 
-/*router.post("/update", async(req, res)=> {
+/*router.post("/pontos", async(req, res)=> {
 		
 	 const users = await Paciente.findAll({
-		attributes: ['peso', 'altura'],
 		where: {
 		  email: req.body.email
 		 }
@@ -86,9 +84,9 @@ router.post("/registrarPaciente", async(req, res)=> {
 				mensagem: "Erro: Email não encontrado!"
 			})
 		}
-	const altura = Utils.altura(users[0].dataValues.altura); 
-	return res.json({
-		altura: altura
+
+		res.redirect('../site/perfil');
+	
 	})       
 	});*/
 
@@ -104,23 +102,26 @@ router.post('/registrar', async(req, res) => {
 
 	await Paciente.create(dt) //aqui
 		.then(()=> {
-			
-			res.render('feedback', {
-				title: "Cal - Feedback",
-				feedback_title: "Sucesso!",
-				feedback: "Paciente cadastrado com sucesso.",
-				color: "success-1",
-				img: "success.jpg"
-			});
+
+			const query = utils.createURLFeedback("Cal - Feedback",
+				"Sucesso!",
+				"Paciente cadastrado com sucesso.",
+				"success-1",
+				"success.png");
+
+			res.redirect(query);
+			return;
 
 		}).catch((err) => {
-			res.render('feedback', {
-				title: "Cal - Feedback",
-				feedback_title: "Erro ao cadastrar",
-				feedback: "Erro ao cadastrar.",
-				color: "error-1",
-				img: "error.png"
-			});
+
+			const query = utils.createURLFeedback("Cal - Feedback",
+			"Erro ao cadastrar.",
+			"Senha ao cadastrar.",
+			"error-1",
+			"error.png");
+
+		res.redirect(query);
+		return;
 		});
 
 	Chronos.freeEmail(session);
@@ -137,14 +138,13 @@ router.post('/login', async(req, res) => {
 	}); 
 
 	if(Object.keys(users).length < 0) {
-		res.render('feedback', {
-			title: "Cal - Feedback",
-			feedback_title: "Erro ao entrar.",
-			feedback: "Email não encontrado no sistema.",
-			color: "error-1",
-			img: "error.png"
-		});
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Erro ao entrar.",
+			"Senha incorreta.",
+			"error-1",
+			"error.png");
 
+		res.redirect(query);
 		return;
 	}
 
@@ -152,13 +152,13 @@ router.post('/login', async(req, res) => {
 
 	if(!pass)
 	{
-		res.render('feedback', {
-			title: "Cal - Feedback",
-			feedback_title: "Erro ao entrar.",
-			feedback: "Senha incorreta.",
-			color: "error-1",
-			img: "error.png"
-		});
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Erro ao entrar.",
+			"Senha incorreta.",
+			"error-1",
+			"error.png");
+
+		res.redirect(query);
 		return;
 	}
 
@@ -183,7 +183,7 @@ router.get('/teste', async(req, res) => {
 		
 });
 
-router.post('/atualizarDados', async(req, res, next) => {
+router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 	const users = await Paciente.findAll({
 		attributes: ['peso', 'altura', 'nome_paciente', 'peso_anterior', 'altura_anterior'],
 		where: {
@@ -201,13 +201,13 @@ router.post('/atualizarDados', async(req, res, next) => {
 			}
 		});
 
-		res.render('feedback', {
-			title: "Cal - Feedback",
-			feedback_title: "Sucesso.",
-			feedback: "Atualizado.",
-			color: "success-1",
-			img: "success.jpg"
-		});
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Sucesso!",
+			"Atualizado.",
+			"success-1",
+			"testecheck.jpeg");
+
+		res.redirect(query);
 		return;
 
 	} else if(tipo == 2) {
@@ -224,13 +224,13 @@ router.post('/atualizarDados', async(req, res, next) => {
 			}
 		});
 
-		res.render('feedback', {
-			title: "Cal - Feedback",
-			feedback_title: "Sucesso.",
-			feedback: "Atualizado.",
-			color: "success-1",
-			img: "success.jpg"
-		});
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Sucesso!",
+			"Atualizado.",
+			"success-1",
+			"sucesso.png");
+
+		res.redirect(query);
 		return;
 
 	} else if(tipo == 3) {
@@ -247,22 +247,22 @@ router.post('/atualizarDados', async(req, res, next) => {
 			}
 		});
 
-		res.render('feedback', {
-			title: "Cal - Feedback",
-			feedback_title: "Sucesso.",
-			feedback: "Atualizado.",
-			color: "success-1",
-			img: "success.jpg"
-		});
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Sucesso!",
+			"Atualizado.",
+			"success-1",
+			"sucesso.png");
+
+		res.redirect(query);
 		return;
 	} else {
-		res.render('feedback', {
-			title: "Cal - Feedback",
-			feedback_title: "Erro ao atualizar.",
-			feedback: "Não foi encontrado tipo de dado.",
-			color: "error-1",
-			img: "error.png"
-		});
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Erro ao atualizar.",
+			"Não foi encontrado tipo de dado..",
+			"error-1",
+			"error.png");
+
+		res.redirect(query);
 		return;
 	}
 });

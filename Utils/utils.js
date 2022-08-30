@@ -4,6 +4,7 @@ var fs = require('fs');
 var jwt = require('jsonwebtoken');
 const Paciente = require('../models/Paciente');
 const { v4: uuidv4 } = require('uuid');
+const url = require('url');  
 
 //Função para criar transportador 
 const transporter = nodemailer.createTransport({
@@ -43,17 +44,11 @@ class Utils {
 	 }
 	//Função para calcular os pontos
 	calcularPontos(peso, novopeso) {
-	  pontos = (peso - novopeso) * 5;
+		
+	  pontos = (peso - novopeso) * 10;
 	  return pontos
 	}
-	/*updateAltura(altura){
-
-		console.log(altura);
- 		users.altura = 170;
- 		users.save();
-		
-	}*/
-
+	
 	encrypt(data, timeInMinutes)
 	{
 		var privateKey  = fs.readFileSync(`${__dirname}/private/private.pem`, {encoding: 'utf8', flag:'r'});
@@ -117,31 +112,58 @@ class Utils {
 	}
 	
 	async verifyJWT(req, res, next) { 
-		var token = req.headers['x-access-token']; 
-	
-		if (!token) 
-			return res.status(401).send({ auth: false, message: 'Token não informado ou expirado.' }); 
-		
-		token = utils.decrypt(token);
-		var data = token.split('&');
-	
-		const users = await Paciente.findAll({
-			attributes: ['email', 'uuid'],
-			where: {
-			  uuid: data[1]
-			}
-		}); 
-	
-		if(Object.keys(users).length < 0) {
-			return res.status(400).json({
-				erro: true,
-				mensagem: "Erro: Cadastro não encontrado!"
-			})
+		var authHeader = req.headers.authorization;
+
+		if (!authHeader) 
+		{
+			if(Object.keys(req.cookies).includes("token")) 
+			{
+				authHeader = `Auth ${req.cookies.token}`;
+			} else return res.status(401).send({ auth: false, message: 'Token não informado ou expirado.' });
+		}			 
+
+		const _token = authHeader.split(' ')[1];
+		const token = utils.decrypt(_token);
+
+		if (!token) {
+			return res.sendStatus(403);
 		}
+
+		const users = await Paciente.findAll({
+			where: {
+			  uuid: token.split('&')[1]
+			 }
+			}); 
+		
+		if(Object.keys(users).length > 0) {
+			req.user = users[0];
+			next();
+		} else res.sendStatus(401);
+	}
+
 	
-		var d_token = `${users[0].dataValues.email}&${users[0].dataValues.uuid}`;
-	
-		return (token === d_token);
+	createFeedback(title, feedback_title, feedback, color, img)
+	{
+		return this.encrypt(JSON.stringify({
+			title: title,
+			feedback_title: feedback_title,
+			feedback: feedback,
+			color: color,
+			img: img
+		}), 60);
+	}
+
+	createURLFeedback(title, feedback_title, feedback, color, img)
+	{
+		const json = this.createFeedback(title, feedback_title, feedback, color, img);
+		const str = url.format({
+			pathname: "../site/feedback",
+			query: {
+				r: json
+			}
+		});
+		
+		return str;
 	}
 
   }
