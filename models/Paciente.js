@@ -53,6 +53,10 @@ const Paciente = db.define('Pacientes', {
     uuid: {
         type: Sequelize.STRING,
         allowNull: false
+    },
+    imagem: {
+        type: Sequelize.STRING,
+        allowNull: true
     }
 });
 

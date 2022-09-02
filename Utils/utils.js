@@ -79,7 +79,7 @@ class Utils {
 
 	hasCookie(req, name)
 	{
-		if(Object.keys(req.cookies)[name])
+		if(Object.keys(req.cookies).includes(name))
 		{
 			return true;
 		} else return false;

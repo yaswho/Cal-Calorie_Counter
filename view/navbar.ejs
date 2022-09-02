@@ -16,14 +16,37 @@
 			<a class="nav-link m-2 menu-item <% if(typeof about !== 'undefined') { %>
                 active
             <% } %>
-            " href="/site/pontos">Troque seus pontos</a>
+            " href="/">Sobre nós</a>
 		</li>
-		<li class="nav-item">
-			<a class="nav-link m-2 menu-item <% if(typeof login !== 'undefined') { %>
-                    active
-                <% } %>
-                " aria-current="page" href="/site/login">Login</a>
+		<% if(typeof isOff === 'undefined') { %>
+			<li class="nav-item">
+				<a class="nav-link m-2 menu-item <% if(typeof login !== 'undefined') { %>
+						active
+					<% } %>
+					" aria-current="page" href="/site/login">Login</a>
 			</li>
+		<% } else { %>
+			<li class="nav-item">
+				<a class="nav-link m-2 menu-item <% if(typeof perfil !== 'undefined') { %>
+						active
+					<% } %>
+					" aria-current="page" href="/site/perfil">Perfil</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link m-2 menu-item <% if(typeof pontos !== 'undefined') { %>
+						active
+					<% } %>
+					" aria-current="page" href="/site/pontos">Pontos</a>
+			</li>
+
+			
+			<li class="nav-item">
+				<a class="nav-link m-2 menu-item <% if(typeof login !== 'undefined') { %>
+						active
+					<% } %>
+					" aria-current="page" href="/" id="logout">Logout</a>
+			</li>
+		<% } %>
 		</ul>
 	</div>
 	</div>

@@ -5,10 +5,35 @@ const Chronos = require('./../Utils/Chronos');
 const utils = require('./../Utils/utils');
 const Paciente = require('../models/Paciente');
 const bcrypt = require('bcrypt');
+const multer = require("multer");
 
 const pontos = 0;
 const novopeso = 0;
 
+var multerStorage = multer.diskStorage({
+	destination: (req, file, cb) => {
+		cb(null, "./resources/assets/uploads/");
+	},	
+	filename: (req, file, cb) => {
+		cb(null, `${Date.now()}-image-${file.originalname}`);
+	},
+});
+
+const multerFilter = (req, file, cb) => {
+	if (file.mimetype.split("/")[1] === "png" || file.mimetype.split("/")[1] === "jpg" || file.mimetype.split("/")[1] === "jpeg") {
+		req.isImage = true;
+		cb(null, true);
+	} else {
+		req.isImage = false;
+		cb(null, false);
+	}
+  };
+
+const upload = multer({
+	storage: multerStorage,
+	fileFilter: multerFilter,
+  });
+  
 //Função para registrar o paciente
 router.post("/registrarPaciente", async(req, res)=> {
    
@@ -23,7 +48,7 @@ router.post("/registrarPaciente", async(req, res)=> {
 			"Erro ao cadastrar",
 			`Erro ao cadastra`,
 			"error-1",
-			"error.png");
+			"erro.png");
 
 		res.redirect(query);
 		return;
@@ -35,7 +60,7 @@ router.post("/registrarPaciente", async(req, res)=> {
 			"Erro ao cadastrar",
 			`O email de confirmação já foi enviado para este o endereço ${req.body.email}.`,
 			"error-1",
-			"error.png");
+			"erro.png");
 
 		res.redirect(query);
 		return;
@@ -118,7 +143,7 @@ router.post('/registrar', async(req, res) => {
 			"Erro ao cadastrar.",
 			"Senha ao cadastrar.",
 			"error-1",
-			"error.png");
+			"erro.png");
 
 		res.redirect(query);
 		return;
@@ -142,7 +167,7 @@ router.post('/login', async(req, res) => {
 			"Erro ao entrar.",
 			"Senha incorreta.",
 			"error-1",
-			"error.png");
+			"erro.png");
 
 		res.redirect(query);
 		return;
@@ -156,7 +181,7 @@ router.post('/login', async(req, res) => {
 			"Erro ao entrar.",
 			"Senha incorreta.",
 			"error-1",
-			"error.png");
+			"erro.png");
 
 		res.redirect(query);
 		return;
@@ -171,7 +196,7 @@ router.post('/login', async(req, res) => {
 //Função de logout 
 router.post('/logout', async(req, res, next) => {
 	utils.deleteCookie(res, 'token');
-	//sucesso
+	res.end();
 });
 
 //funnção para mostrar os dados do banco 
@@ -260,12 +285,45 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 			"Erro ao atualizar.",
 			"Não foi encontrado tipo de dado..",
 			"error-1",
-			"error.png");
+			"erro.png");
 
 		res.redirect(query);
 		return;
 	}
 });
 
+
+//https://attacomsian.com/blog/uploading-files-nodejs-express
+router.post('/uploadImage', utils.verifyJWT, upload.single('imagem'), async(req, res, next) => {
+
+
+	if(req.isImage === false)
+	{
+		const query = utils.createURLFeedback("Cal - Feedback",
+		"Erro ao enviar.",
+		"O arquivo não é uma imagem.",
+		"error-1",
+		"erro.png");
+
+		res.redirect(query);
+		return;
+	}
+	
+	await Paciente.update({ imagem: `/resources/assets/uploads/${req.file.filename}` },
+	{
+		where: {
+			uuid: req.user.uuid
+		}
+	});
+
+	const query = utils.createURLFeedback("Cal - Feedback",
+		"Sucesso ao enviar.",
+		"O arquivo foi enviado com sucesso.",
+		"success-1",
+		"sucesso.png");
+
+		res.redirect(query);
+})
+
 //Exportando router
-module.exports= router;
+module.exports = router;

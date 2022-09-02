@@ -1,5 +1,5 @@
 <%- include('header', {title: title}); %>
-<%- include('navbar') %>
+<%- include('navbar', {pontos: "active", isOff: false}) %>
 </br>
 <h1>Estes são seus pontos!!!</h1>
 
@@ -8,7 +8,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Veja seus resultados</h5>
-          <img src="/imgs/gra.jpg" class="img-thumbnail" alt="...">
+          <img src="/public/imgs/gra.jpg" class="img-thumbnail" alt="...">
           <p class="card-text">Você perdeu X calorias essa semana</p>
           <a href="#" class="btn btn-primary">Gráficos</a>
         </div>
@@ -18,7 +18,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Veja seus pontos!</h5>
-          <img src="/imgs/apple1.png" class="img-fluid rounded-start" alt="...">
+          <img src="/public/imgs/apple1.png" class="img-fluid rounded-start" alt="...">
           <p class="card-text">Você acumulou x pontos essa semana</p>
           <a href="#" class="btn btn-primary">Troque seus pontos</a>
         </div>

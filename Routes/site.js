@@ -11,60 +11,42 @@ router.get('/', (req,res) => {
     });
 })
 
-router.get('/registrar', (req,res)=>{
-
+router.get('/registrar', (req,res) => {
 	res.render("registrar", {
         title: "Cal - Registro"
     });
 })
 
-router.get('/login', async (req,res)=>{
+router.get('/login', async (req,res) => {
 
-	if(utils.hasCookie(req, "token"))
-	{
-		res.redirect('/perfil');
-		return;		
-	}
+	var t = utils.hasCookie(req, 'token');
+
 	res.render("login", {
-        title: "Cal - Login"
+        title: "Cal - Login",
+		token: t
     });
 })
 
-router.get('/perfil', utils.verifyJWT, async (req, res, next)=> {
+router.get('/perfil', utils.verifyJWT, async (req, res, next) => {
 
-	if(utils.hasCookie(req, "token"))
+	const user = req.user;
+	var img;
+
+	if(user['imagem'] == null)
 	{
+		img = '/public/imgs/usuario.jpg'
+	} else img = user.imagem;
 
-		const query = utils.createURLFeedback("Cal - Feedback",
-			"Token não encontrado.",
-			"Favor logar novamente.",
-			"error-1",
-			"error.png");
-
-		res.redirect(query);
-		return;
-	}
-
-	const users = await Paciente.findAll({
-		attributes: ['peso', 'altura', 'nome_paciente'],
-		where: {
-		  uuid: utils.getUUIDFromToken(req.cookies.token)
-		 }
-		}); 
-
-	const imc = utils.imc(users[0].dataValues.peso, users[0].dataValues.altura);   
-
+	const imc = utils.imc(user.peso, user.altura);   
 	//Imprimir no HTML 
 	res.render("perfil", {
         title: "Cal - Perfil",
-		name: users[0].dataValues.nome_paciente,
-		altura: users[0].dataValues.altura,
-		peso: users[0].dataValues.peso,
-		imc: imc 
-
+		name: user.nome_paciente,
+		altura: user.altura,
+		peso: user.peso,
+		imc: imc,
+		img: img
     });
-
-	//res.redirect('../site/pontos');
 
 })
 

@@ -14,7 +14,11 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');  
 const helmet = require("helmet");
 const utils = require("./Utils/utils");
+const path = require('path');
 
+// app.use(fileUpload({
+//     createParentPath: true
+// }));
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true })); 
@@ -22,7 +26,8 @@ app.use(bodyParser.json());
 app.use(helmet());
 app.use(cookieParser());
 
-app.use(express.static("./public"));
+app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/resources', express.static(path.join(__dirname, 'resources')));
 app.set('view engine', 'ejs');
 app.set('views', './view')
 
@@ -30,15 +35,6 @@ app.set('views', './view')
 app.use('/api', api)
 app.use('/site', site)
 
-
-//Função para criar transportador  
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-	user: process.env.EMAIL,
-	pass: process.env.EMAIL_PASSWORD
-  }
-});
 
 //Direcionando para o Frontend 
 app.get("/", async(req, res)=> {
