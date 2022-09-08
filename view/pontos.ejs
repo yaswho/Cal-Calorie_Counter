@@ -10,7 +10,7 @@
           <h5 class="card-title">Veja seus resultados</h5>
           <img src="/public/imgs/gra.jpg" class="img-thumbnail" alt="...">
           <p class="card-text">Você perdeu X calorias essa semana</p>
-          <a href="#" class="btn btn-primary">Gráficos</a>
+          <a href="/site/graficos" class="btn btn-primary">Gráficos</a>
         </div>
       </div>
     </div>
@@ -19,7 +19,14 @@
         <div class="card-body">
           <h5 class="card-title">Veja seus pontos!</h5>
           <img src="/public/imgs/apple1.png" class="img-fluid rounded-start" alt="...">
-          <p class="card-text">Você acumulou x pontos essa semana</p>
+          <p class="card-text">Pontos acumulados</p>
+          <div class="input-group mb-3">
+            <input type="number" name="pontos" class="form-control" placeholder="<%= pontos %>" aria-label="Pontos" aria-describedby="basic-addon1" disabled>
+          </div>
+          <div class="input-group mb-3">
+            <input type="number" name="peso" class="form-control" placeholder="<%= peso %>" aria-label="Pontos" aria-describedby="basic-addon1" disabled> 
+            <input type="number" name="pesoa" class="form-control" placeholder="<%= peso_anterior %>" aria-label="Pontos" aria-describedby="basic-addon1" disabled>
+          </div>
           <a href="#" class="btn btn-primary">Troque seus pontos</a>
         </div>
       </div>

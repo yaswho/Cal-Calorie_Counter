@@ -43,10 +43,10 @@ class Utils {
 		  });
 	 }
 	//Função para calcular os pontos
-	calcularPontos(peso, novopeso) {
-		
-	  pontos = (peso - novopeso) * 10;
-	  return pontos
+	calcularPontos(user) {
+		const peso = user.peso;
+		const peso_anterior = utils.getLast(user.peso_anterior, user.peso).peso;
+	  	return (Math.max(peso, peso_anterior) - Math.min(peso, peso_anterior))*15;	
 	}
 	
 	encrypt(data, timeInMinutes)
@@ -137,6 +137,14 @@ class Utils {
 		
 		if(Object.keys(users).length > 0) {
 			req.user = users[0];
+			if(req.user.peso_anterior !== '' && req.user.peso_anterior !== 'undefined')
+			{
+				req.user.peso_anterior = JSON.parse(req.user.peso_anterior);
+			}
+			if(req.user.altura_anterior !== '' && req.user.altura_anterior !== 'undefined')
+			{
+				req.user.altura_anterior = JSON.parse(req.user.altura_anterior);
+			}
 			next();
 		} else res.sendStatus(401);
 	}
@@ -164,6 +172,12 @@ class Utils {
 		});
 		
 		return str;
+	}
+
+	//pegar o último
+	getLast(anterior_lista, std)
+	{	
+		return (anterior_lista.length > 0) ? anterior_lista[anterior_lista.length - 1] : std;
 	}
 
   }

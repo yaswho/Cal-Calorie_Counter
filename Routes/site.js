@@ -12,8 +12,10 @@ router.get('/', (req,res) => {
 })
 
 router.get('/registrar', (req,res) => {
+	const arr = [];
 	res.render("registrar", {
-        title: "Cal - Registro"
+        title: "Cal - Registro",
+		arr: arr.toString()
     });
 })
 
@@ -53,8 +55,24 @@ router.get('/perfil', utils.verifyJWT, async (req, res, next) => {
 
 router.get('/pontos', utils.verifyJWT, async(req, res, next)=>{
 
+	const user = req.user;
+	
+	const pontos = utils.calcularPontos(user);   
+	//Imprimir no HTML 
 	res.render("pontos", {
-        title: "Cal - Pontos"
+        title: "Cal - Pontos",
+		name: user.nome_paciente,
+		altura: user.altura,
+		peso: user.peso,
+		peso_anterior: utils.getLast(user.peso_anterior, user.peso).peso,
+		pontos: pontos
+    });
+})
+
+router.get('/graficos', utils.verifyJWT, async(req, res, next)=>{
+
+	res.render("graficos", {
+        title: "Cal - Graficos"
     });
 })
 

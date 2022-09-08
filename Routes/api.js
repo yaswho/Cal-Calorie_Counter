@@ -7,9 +7,6 @@ const Paciente = require('../models/Paciente');
 const bcrypt = require('bcrypt');
 const multer = require("multer");
 
-const pontos = 0;
-const novopeso = 0;
-
 var multerStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		cb(null, "./resources/assets/uploads/");
@@ -92,28 +89,6 @@ router.post("/registrarPaciente", async(req, res)=> {
 	return;
 
 });
-
-
-//Função para inserir novos valores de altura e peso 
-/*router.post("/pontos", async(req, res)=> {
-		
-	 const users = await Paciente.findAll({
-		where: {
-		  email: req.body.email
-		 }
-		}); 
-
-	if(Object.keys(users).length < 0) {
-			return res.status(400).json({
-				erro: true,
-				mensagem: "Erro: Email não encontrado!"
-			})
-		}
-
-		res.redirect('../site/perfil');
-	
-	})       
-	});*/
 
 
 router.post('/registrar', async(req, res) => {
@@ -209,12 +184,7 @@ router.get('/teste', async(req, res) => {
 });
 
 router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
-	const users = await Paciente.findAll({
-		attributes: ['peso', 'altura', 'nome_paciente', 'peso_anterior', 'altura_anterior'],
-		where: {
-		  uuid: utils.getUUIDFromToken(req.cookies.token)
-		 }
-		}); 
+	const user = req.user;
 
 	var tipo = (Number.isInteger(req.body.update)) ? req.body.update : parseInt(req.body.update);
 
@@ -222,7 +192,7 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 	{
 		await Paciente.update({ nome_paciente: req.body.update_name }, {
 			where: {
-				uuid: utils.getUUIDFromToken(req.cookies.token)
+				uuid: user.uuid
 			}
 		});
 
@@ -236,16 +206,17 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 		return;
 
 	} else if(tipo == 2) {
-		var alturas = users[0].dataValues.altura_anterior;
 
-		alturas[alturas.length] = {
-			altura: users[0].dataValues.altura,
+		var alturas = (user.altura_anterior === 'undefined' || user.altura_anterior === '') ? [] : JSON.parse(user.altura_anterior);
+
+		alturas.push({
+			altura: user.altura,
 			data: new Date().toLocaleDateString()
-		}
+		});
 
-		await Paciente.update({ altura: req.body.update_altura, altura_anterior: alturas }, {
+		await Paciente.update({ altura: req.body.update_altura, altura_anterior: JSON.stringify(alturas) }, {
 			where: {
-				uuid: utils.getUUIDFromToken(req.cookies.token)
+				uuid: user.uuid
 			}
 		});
 
@@ -259,16 +230,17 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 		return;
 
 	} else if(tipo == 3) {
-		var pesos = users[0].dataValues.peso_anterior;
 
-		pesos[pesos.length] = {
-			peso: users[0].dataValues.peso,
+		var pesos = (user.peso_anterior === 'undefined' || user.peso_anterior === '') ? [] : JSON.parse(user.peso_anterior);
+
+		pesos.push({
+			peso: user.peso,
 			data: new Date().toLocaleDateString()
-		}
+		});
 
-		await Paciente.update({ peso: req.body.update_peso, peso_anterior: pesos }, {
+		await Paciente.update({ peso: req.body.update_peso, peso_anterior: JSON.stringify(pesos) }, {
 			where: {
-				uuid: utils.getUUIDFromToken(req.cookies.token)
+				uuid: user.uuid
 			}
 		});
 
