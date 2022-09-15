@@ -3,11 +3,16 @@ const router = express.Router();
 const utils = require('./../Utils/utils');
 const Paciente = require('../models/Paciente');
 const Chronos = require('./../Utils/Chronos'); 
+const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
+const chartJSNodeCanvas = new ChartJSNodeCanvas({ type: 'svg', width: 800, height: 600 }); 
 
-router.get('/', (req,res) => {
+router.get('/', async (req,res) => {
+
+	var isoff = await utils.canRedirect(req);
 
 	res.render("index", {
-        title: "Cal - Página Inicial"
+        title: "Cal - Página Inicial",
+		isOff: isoff
     });
 })
 
@@ -21,7 +26,7 @@ router.get('/registrar', (req,res) => {
 
 router.get('/login', async (req,res) => {
 
-	var t = utils.hasCookie(req, 'token');
+	var t = await utils.canRedirect(req)
 
 	res.render("login", {
         title: "Cal - Login",
@@ -52,12 +57,11 @@ router.get('/perfil', utils.verifyJWT, async (req, res, next) => {
 
 })
 
-
-router.get('/pontos', utils.verifyJWT, async(req, res, next)=>{
+//Rota para quantos pontos tem 
+router.get('/pontos', utils.verifyJWT, async(req, res, next) => {
 
 	const user = req.user;
-	
-	const pontos = utils.calcularPontos(user);   
+ 
 	//Imprimir no HTML 
 	res.render("pontos", {
         title: "Cal - Pontos",
@@ -65,15 +69,125 @@ router.get('/pontos', utils.verifyJWT, async(req, res, next)=>{
 		altura: user.altura,
 		peso: user.peso,
 		peso_anterior: utils.getLast(user.peso_anterior, user.peso).peso,
-		pontos: pontos
+		pontos: user.pontos
     });
 })
 
-router.get('/graficos', utils.verifyJWT, async(req, res, next)=>{
+//Rota para troca de pontos
+router.get('/trocadepontos', utils.verifyJWT, async(req, res, next) => {
 
-	res.render("graficos", {
-        title: "Cal - Graficos"
+	const user = req.user;
+	 
+	//Imprimir no HTML 
+	res.render("trocadepontos", {
+        title: "Cal - Troca de Pontos",
+		name: user.nome_paciente,
+		altura: user.altura,
+		peso: user.peso,
+		peso_anterior: utils.getLast(user.peso_anterior, user.peso).peso,
+		pontos: user.pontos
     });
+})
+
+
+//Gráficos
+router.get('/graficos', utils.verifyJWT, async(req, res, next) => {
+
+	const user = req.user;
+
+
+		const width = 600; //px
+		const height = 400; //px
+		const backgroundColour = 'white'; // Uses https://www.w3schools.com/tags/canvas_fillstyle.asp
+		const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour });
+
+		const data = {
+			labels: [1,2,3,4,5,6,7,8,9,10,11,12,13],
+			datasets: [{
+			  label: ' Desempenho de peso',
+			  data: utils.datalize(user),
+			  fill: false,
+			  borderColor: 'rgb(75, 192, 192)',
+			  tension: 0.1,
+			  showLine: true
+			}]
+		  };
+
+		  
+		(async () => {
+			const configuration = {
+				type: 'scatter',
+				data: data,
+				options: {
+					plugins: {
+						display: true,
+						legend: true,
+						title: {
+							display: true,
+							text: "EXEMPLO"
+						},
+						tooltip: {
+							callbacks: {
+								label: function(ctx)  {
+									console.log(ctx)
+									return "ctx"
+								}
+							}
+						}
+					},
+					scales: {
+						yAxes: [{
+							gridLines: {
+								display: true,
+								color: "rgba(255,99,132,0.2)"
+						 	},
+							ticks: {
+								beginAtZero: true
+							}
+						}],
+						xAxes: [{
+							gridLines: {
+								display: true,
+								color: "rgba(255,99,132,0.2)",
+							},
+							ticks: {
+								beginAtZero: true,
+								max: 13,
+								min: 0
+							}
+					   }],
+					   y: {
+							stacked: true,
+					   },
+					   x: {
+							type: 'category',
+							labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out',  'Nov', 'Dez'],
+							min: 0,
+                			max: 13
+					   }
+					 },
+					 elements: {
+						line: {
+							tension: .1, // bezier curves
+						}
+					 }
+				},
+
+			};
+
+			const image = await chartJSNodeCanvas.renderToBuffer(configuration);
+			const dataUrl = await chartJSNodeCanvas.renderToDataURL(configuration);
+
+			res.render("graficos", {
+				title: "Cal - Graficos",
+				name: user.nome_paciente,
+				altura: user.altura,
+				peso: user.peso,
+				peso_anterior: JSON.stringify(user.peso_anterior),
+				buffer: dataUrl.toString()
+			});
+
+		})();
 })
 
 router.get('/registro/:authId',(req,res) =>{

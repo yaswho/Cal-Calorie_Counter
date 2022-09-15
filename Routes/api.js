@@ -185,6 +185,7 @@ router.get('/teste', async(req, res) => {
 
 router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 	const user = req.user;
+	var isoff = await utils.canRedirect(req);
 
 	var tipo = (Number.isInteger(req.body.update)) ? req.body.update : parseInt(req.body.update);
 
@@ -200,14 +201,15 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 			"Sucesso!",
 			"Atualizado.",
 			"success-1",
-			"testecheck.jpeg");
+			"testecheck.jpeg",
+			isoff);
 
 		res.redirect(query);
 		return;
 
 	} else if(tipo == 2) {
 
-		var alturas = (user.altura_anterior === 'undefined' || user.altura_anterior === '') ? [] : JSON.parse(user.altura_anterior);
+		var alturas = (user.altura_anterior === 'undefined' || user.altura_anterior === '') ? [] : user.altura_anterior;
 
 		alturas.push({
 			altura: user.altura,
@@ -224,21 +226,34 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 			"Sucesso!",
 			"Atualizado.",
 			"success-1",
-			"sucesso.png");
+			"sucesso.png",
+			isoff);
 
 		res.redirect(query);
 		return;
 
 	} else if(tipo == 3) {
 
-		var pesos = (user.peso_anterior === 'undefined' || user.peso_anterior === '') ? [] : JSON.parse(user.peso_anterior);
-
+		var pesos = (user.peso_anterior === 'undefined' || user.peso_anterior === '') ? [] : user.peso_anterior;
+		var peso_anterior = user.peso;
 		pesos.push({
 			peso: user.peso,
-			data: new Date().toLocaleDateString()
+			data: utils.formatDate(new Date())
 		});
 
+
 		await Paciente.update({ peso: req.body.update_peso, peso_anterior: JSON.stringify(pesos) }, {
+			where: {
+				uuid: user.uuid
+			}
+		});
+
+		const pts = parseInt(user.pontos) + utils.calcularPontos(user, req.body.update_peso, peso_anterior);
+
+		console.log("pts")
+		console.log(parseInt(user.pontos))
+
+		await Paciente.update({ pontos: pts }, {
 			where: {
 				uuid: user.uuid
 			}
@@ -248,7 +263,8 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 			"Sucesso!",
 			"Atualizado.",
 			"success-1",
-			"sucesso.png");
+			"sucesso.png",
+			isoff);
 
 		res.redirect(query);
 		return;
@@ -257,25 +273,25 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 			"Erro ao atualizar.",
 			"Não foi encontrado tipo de dado..",
 			"error-1",
-			"erro.png");
+			"erro.png",
+			isoff);
 
 		res.redirect(query);
 		return;
 	}
 });
 
-
-//https://attacomsian.com/blog/uploading-files-nodejs-express
 router.post('/uploadImage', utils.verifyJWT, upload.single('imagem'), async(req, res, next) => {
 
-
+	var isoff = await utils.canRedirect(req);
 	if(req.isImage === false)
 	{
 		const query = utils.createURLFeedback("Cal - Feedback",
 		"Erro ao enviar.",
 		"O arquivo não é uma imagem.",
 		"error-1",
-		"erro.png");
+		"erro.png",
+		isoff);
 
 		res.redirect(query);
 		return;
@@ -292,9 +308,10 @@ router.post('/uploadImage', utils.verifyJWT, upload.single('imagem'), async(req,
 		"Sucesso ao enviar.",
 		"O arquivo foi enviado com sucesso.",
 		"success-1",
-		"sucesso.png");
+		"sucesso.png",
+		isoff);
 
-		res.redirect(query);
+	res.redirect(query);
 })
 
 //Exportando router

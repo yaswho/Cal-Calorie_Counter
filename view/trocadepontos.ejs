@@ -1,0 +1,67 @@
+<%- include('header', {title: title}); %>
+<%- include('navbar', {isOff: false}); %>
+
+</br>
+<center>
+    <h1> Escolha seu Prêmio </h1>
+</center>
+
+<div class="offset-md-1 col-md-10 col-sm-16">
+          <div class="input-group mb-3">
+            <span class="input-group-text fs-5 fw-bold" id="basic-addon1">Pontos acumulados</span>
+            <input type="number" name="pontos" class="form-control" placeholder="<%= pontos %>" aria-label="Pontos" aria-describedby="basic-addon1" disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div> 
+    <div class="offset-md-1 col-md-10 col-sm-16">
+    <div class="card-group">
+    <div class="card">
+    <img src="/public/imgs/desconto.jpg" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">25% OFF</h5>
+      <p class="card-text"> 25% de Desconto na com um nutricionista ou academia parceira</p>
+    </div>
+    <div class="card-footer">
+      <div class="d-grid gap-2 col-6 mx-auto">
+        <a href="/site/graficos" class="btn btn-primary">750 pontos</a>
+      </div>
+    </div>
+    </div>
+
+   <div class="card">
+    <img src="/public/imgs/sonhoV2.jpg" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">Bombom Sonho de Valsa</h5>
+      <p class="card-text"> Um bombom sonho de valsa</p>
+    </div>
+    <div class="card-footer">
+      <div class="d-grid gap-2 col-6 mx-auto">
+        <a href="/site/graficos" class="btn btn-primary">100 pontos</a>
+      </div>
+    </div>
+    </div>
+    <div class="card">
+    <img src="/public/imgs/acai5.png" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">Açaí</h5>
+      <p class="card-text">Vale um açaí de 400ml em uma loja parceira</p>
+    </div>
+    <div class="card-footer">
+      <div class="d-grid gap-2 col-6 mx-auto">
+        <a href="/site/graficos" class="btn btn-primary">500 pontos</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+
+
+
+          
+
+<%- include('footer'); %>

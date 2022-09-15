@@ -17,11 +17,31 @@ const transporter = nodemailer.createTransport({
 
 class Utils {
 	constructor() {
+		this.IMC = {
+			ABAIXO_DO_PESO: 1,
+			PESO_NORMAL: 2,
+			EXCESSO_DE_PESO: 3,
+			OBESIDADE: 4,
+			OBESIDADE_EXCESSIVA: 5
+		}
 
+		this.getWeight = function(imc) {
+			if(imc === this.IMC.ABAIXO_DO_PESO) {
+				return 8;
+			} else if(imc === this.IMC.PESO_NORMAL) {
+				return 5;
+			} else if(imc === this.IMC.EXCESSO_DE_PESO) {
+				return 6;
+			} else if(imc === this.IMC.OBESIDADE) {
+				return 7;
+			} else if(imc === this.IMC.OBESIDADE_EXCESSIVA) {
+				return 8;
+			} else return 1;
+		}
 	 }
 	 //Função para calcular o IMC do paciente
 	imc(peso, altura) {
-
+		if(peso === 0) return 0;
 		return peso/(altura*altura);
 	 }
 
@@ -43,10 +63,67 @@ class Utils {
 		  });
 	 }
 	//Função para calcular os pontos
-	calcularPontos(user) {
-		const peso = user.peso;
-		const peso_anterior = utils.getLast(user.peso_anterior, user.peso).peso;
-	  	return (Math.max(peso, peso_anterior) - Math.min(peso, peso_anterior))*15;	
+	calcularPontos(user, peso, peso_anterior) {
+		const imc = this.getIMC(this.imc(peso, user.altura));
+		const imc_anterior = this.getIMC(this.imc(peso_anterior, user.altura));
+		var weight = -1;
+
+		/*
+			|weight| = magnitude 
+			sinal = controla se add ou rem
+
+			ex: final - inicial, IMC = peso normal
+
+			caso 1:
+			final = 50
+			inicial = 60
+
+			50 - 60 = -10
+
+			(começa)
+			weight = -1 -> peso normal ( x5 ) => weight = -5
+
+			-10 * -5 = 50 pontos
+
+			caso 2:
+			final = 70
+			inicial = 50
+
+			70 - 50 = 20
+
+			weight = -1 -> peso normal ( x5 ) => weight = -5
+
+			20 * -5 = -100 pontos
+
+
+		*/
+
+		if(imc === imc_anterior) // IMC ficou igual
+		{
+			weight *= this.getWeight(imc);
+		} else if(imc > imc_anterior) { // IMC aumentou
+			if(imc_anterior === this.IMC.ABAIXO_DO_PESO)
+			{
+				weight *= this.getWeight(imc_anterior);
+			} else weight *= this.getWeight(imc);
+		} else { // imc < imc_anterior || IMC diminuiu
+			if(imc === this.IMC.ABAIXO_DO_PESO)
+			{
+				weight *= this.getWeight(imc);
+			} else weight *= this.getWeight(imc_anterior);
+		}
+
+		console.log("weight")
+		console.log(weight)
+		
+
+		console.log("peso")
+		console.log(peso)
+		console.log("peso ant")
+		console.log(peso_anterior)
+		console.log("calc")
+		console.log((peso - peso_anterior)*weight)
+	  	return (peso - peso_anterior)*weight;	
 	}
 	
 	encrypt(data, timeInMinutes)
@@ -149,21 +226,40 @@ class Utils {
 		} else res.sendStatus(401);
 	}
 
+	async hasUUID(token) 
+	{
+		const tk = utils.decrypt(token);
+
+		if (!tk) {
+			return false;
+		}
+
+		const users = await Paciente.findAll({
+			where: {
+			  uuid: tk.split('&')[1]
+			 }
+			}); 
+		
+		if(Object.keys(users).length > 0) {
+			return true;
+		} else return false;
+	}
 	
-	createFeedback(title, feedback_title, feedback, color, img)
+	createFeedback(title, feedback_title, feedback, color, img, isOff)
 	{
 		return this.encrypt(JSON.stringify({
 			title: title,
 			feedback_title: feedback_title,
 			feedback: feedback,
 			color: color,
-			img: img
+			img: img,
+			isOff: isOff
 		}), 60);
 	}
 
-	createURLFeedback(title, feedback_title, feedback, color, img)
+	createURLFeedback(title, feedback_title, feedback, color, img, isOff)
 	{
-		const json = this.createFeedback(title, feedback_title, feedback, color, img);
+		const json = this.createFeedback(title, feedback_title, feedback, color, img, isOff);
 		const str = url.format({
 			pathname: "../site/feedback",
 			query: {
@@ -180,8 +276,173 @@ class Utils {
 		return (anterior_lista.length > 0) ? anterior_lista[anterior_lista.length - 1] : std;
 	}
 
-  }
+	prepareChart(user)
+	{
+		var lista = user.peso_anterior;
 
-  const utils = new Utils();
-  
-  module.exports = utils; 
+		var pesos = []
+		var datas = []
+
+		for(var obj in lista)
+		{
+			pesos.push(lista[obj].peso)
+			datas.push(lista[obj].data)
+		}
+
+		return {pesos, datas}
+	}
+
+	dataSplit(data)
+	{
+		var splitted = data.split('/');
+
+		return { day: parseInt(splitted[0]), month: parseInt(splitted[1]), year: parseInt(splitted[2]) }
+	}
+
+	normalize(date)
+	{
+		var data = this.dataSplit(date);
+
+		var n;
+
+		switch(data.month) {
+			case 1:
+				var base = 0.5;
+				n = base + data.day/31;
+				break;
+			case 2:
+				var base = 1.5;
+				var days = (bissex(date.year)) ? 29 : 28;
+				n = base + data.day/days;
+				break;
+			case 3:
+				var base = 2.5;
+				n = base + data.day/31;;
+				break;
+			case 4:
+				var base = 3.5;
+				n = base + data.day/30;
+				break;
+			case 5:
+				var base = 4.5;
+				n = base + data.day/31;
+				break;
+			case 6:
+				var base = 5.5;
+				n = base + data.day/30;
+				break;
+			case 7:
+				var base = 6.5;
+				n = base + data.day/31;
+				break;
+			case 8:
+				var base = 7.5;
+				n = base + data.day/31;
+				break;
+			case 9:
+				var base = 8.5;
+				n = base + data.day/30;
+				break;
+			case 10:
+				var base = 9.5;
+				n = base + data.day/31;
+				break;
+			case 11:
+				var base = 10.5;
+				n = base + data.day/30;
+				break;
+			case 12:
+				var base = 11.5;
+				n = base + data.day/31;
+				break;
+			default:
+				var base = 0;
+				n = base + data.day/31;
+				break;
+		}
+
+		return n;
+	}
+
+	datalize(user)
+	{
+		var pesos = user.peso_anterior;
+		var data = [];
+
+		for(var i = 0; i < pesos.length; i++)
+		{
+			var x = this.normalize(pesos[i].data);
+			data.push({x: x, y: pesos[i].peso});
+		}
+
+		data.push({x: this.normalize(this.formatDate(new Date())), y: user.peso })
+
+		return data;
+	}
+	
+	getIMC(imc)
+	{
+		// ABAIXO DO PESO
+		if(imc < 18.5)
+		{
+			return this.IMC.ABAIXO_DO_PESO;
+			// NORMAL
+		} else if(imc >= 18.5 && imc <= 24.9) {
+			return this.IMC.PESO_NORMAL; 
+			// SOBREPESO
+		} else if(imc >= 25 && imc <= 29.9) {
+			return this.IMC.EXCESSO_DE_PESO;
+			// OBESIDADE
+		} else if(imc >= 30 && imc < 35) {
+			return this.IMC.OBESIDADE;
+			// OBESIDADE EXTREMA
+		} else {
+			return this.IMC.OBESIDADE_EXCESSIVA;
+		}
+	}
+
+	async canRedirect(req)
+	{
+		var t;
+
+		if(utils.hasCookie(req, 'token'))
+		{
+			if(req.cookies.token === 'undefined' || req.cookies.token === '') return;
+			var has = await utils.hasUUID(req.cookies.token)
+			if(has)
+			{
+				t = true;
+			}
+		}
+
+		return t;
+	}
+
+	formatDate(inputDate) {
+		let date, month, year;
+	  
+		date = inputDate.getDate();
+		month = inputDate.getMonth() + 1;
+		year = inputDate.getFullYear();
+	  
+		  date = date
+			  .toString()
+			  .padStart(2, '0');
+	  
+		  month = month
+			  .toString()
+			  .padStart(2, '0');
+	  
+		return `${date}/${month}/${year}`;
+	  }
+
+}
+
+function bissex(year)
+{
+	return (year % 100 === 0) ? (year % 400 === 0) : (year % 4 === 0);
+}
+
+const utils = new Utils();
+
+module.exports = utils; 

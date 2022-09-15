@@ -57,6 +57,10 @@ const Paciente = db.define('Pacientes', {
     imagem: {
         type: Sequelize.STRING,
         allowNull: true
+    },
+    pontos: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
     }
 });
 

@@ -127,7 +127,6 @@ class Chronos
                 throw err;
             }
             
-            console.log(data.toString());
             const checkers = JSON.parse(data.toString());
 
             if(Object.keys(checkers) > 0) this.emailsjson = checkers;

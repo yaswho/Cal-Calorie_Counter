@@ -18,7 +18,7 @@
             <% } %>
             " href="/">Sobre nós</a>
 		</li>
-		<% if(typeof isOff === 'undefined') { %>
+		<% if(typeof isOff === 'undefined' || isOff === true) { %>
 			<li class="nav-item">
 				<a class="nav-link m-2 menu-item <% if(typeof login !== 'undefined') { %>
 						active
