@@ -130,6 +130,14 @@
   filter: invert(99%) sepia(84%) saturate(2%) hue-rotate(124deg) brightness(112%) contrast(100%);
 }
 
+.k-none {
+  display: none;
+}
+
+.k-block {
+  display: block;
+}
+
 .bd-callout {
   padding: 1.25rem;
   margin-top: 1.25rem;

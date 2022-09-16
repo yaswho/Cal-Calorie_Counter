@@ -83,7 +83,7 @@ router.post("/registrarPaciente", async(req, res)=> {
 		"Sucesso!",
 		"Siga para seu email para terminar o seu registro.",
 		"success-1",
-		"success.png");
+		"testecheck.jpeg");
 
 	res.redirect(query);
 	return;
@@ -107,7 +107,7 @@ router.post('/registrar', async(req, res) => {
 				"Sucesso!",
 				"Paciente cadastrado com sucesso.",
 				"success-1",
-				"success.png");
+				"testecheck.jpeg");
 
 			res.redirect(query);
 			return;
@@ -226,7 +226,7 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 			"Sucesso!",
 			"Atualizado.",
 			"success-1",
-			"sucesso.png",
+			"testecheck.jpeg",
 			isoff);
 
 		res.redirect(query);
@@ -263,7 +263,7 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 			"Sucesso!",
 			"Atualizado.",
 			"success-1",
-			"sucesso.png",
+			"testecheck.jpeg",
 			isoff);
 
 		res.redirect(query);
@@ -308,7 +308,7 @@ router.post('/uploadImage', utils.verifyJWT, upload.single('imagem'), async(req,
 		"Sucesso ao enviar.",
 		"O arquivo foi enviado com sucesso.",
 		"success-1",
-		"sucesso.png",
+		"testecheck.jpeg",
 		isoff);
 
 	res.redirect(query);

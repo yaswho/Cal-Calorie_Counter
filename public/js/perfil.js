@@ -1,54 +1,49 @@
 var select = document.querySelector('#update_select');
 
-select.addEventListener('change', function() {
-    
-    var value = parseInt(this.value);
+select.addEventListener('change', (event) => {
+
+    var value = parseInt(select.value);   
 
     if(value == 1)
     {
-        document.getElementById("update_name_valor").classList.add("d-block");
-        document.getElementById("update_name_valor").classList.remove("d-none");
+        document.getElementById("name_field").style.display = "flex";
 
-        if(!document.getElementById("update_altura_valor").classList.contains("d-none"))
+        if(document.getElementById("altura_field").style.display != "none")
         {
-            document.getElementById("update_altura_valor").classList.add("d-none");
-            document.getElementById("update_altura_valor").classList.remove("d-block");
+            document.getElementById("altura_field").style.display = "none";
         }
 
-        if(!document.getElementById("update_peso_valor").classList.contains("d-none"))
+        if(!document.getElementById("peso_field").style.display != "none")
         {
-            document.getElementById("update_peso_valor").classList.add("d-none");
-            document.getElementById("update_peso_valor").classList.remove("d-block");
+            document.getElementById("peso_field").style.display = "none"
         }
     } else if(value == 2) {
-        document.getElementById("update_altura_valor").classList.add("d-block");
-        document.getElementById("update_altura_valor").classList.remove("d-none");
+        document.getElementById("altura_field").style.display = "flex";
 
-        if(!document.getElementById("update_name_valor").classList.contains("d-none"))
+        if(document.getElementById("name_field").style.display != "none")
         {
-            document.getElementById("update_name_valor").classList.add("d-none");
-            document.getElementById("update_name_valor").classList.remove("d-block");
+            document.getElementById("name_field").style.display = "none"
         }
 
-        if(!document.getElementById("update_peso_valor").classList.contains("d-none"))
+        if(document.getElementById("peso_field").style.display != "none")
         {
-            document.getElementById("update_peso_valor").classList.add("d-none");
-            document.getElementById("update_peso_valor").classList.remove("d-block");
+            document.getElementById("peso_field").style.display = "none"
         }
     } else if(value == 3) {
-        document.getElementById("update_peso_valor").classList.add("d-block");
-        document.getElementById("update_peso_valor").classList.remove("d-none");
+        document.getElementById("peso_field").style.display = "flex";
 
-        if(!document.getElementById("update_altura_valor").classList.contains("d-none"))
+        if(document.getElementById("altura_field").style.display != "none")
         {
-            document.getElementById("update_altura_valor").classList.add("d-none");
-            document.getElementById("update_altura_valor").classList.remove("d-block");
+            document.getElementById("altura_field").style.display = "none"
         }
 
-        if(!document.getElementById("update_name_valor").classList.contains("d-none"))
+        if(document.getElementById("name_field").style.display != "none")
         {
-            document.getElementById("update_name_valor").classList.add("d-none");
-            document.getElementById("update_name_valor").classList.remove("d-block");
+            document.getElementById("name_field").style.display = "none"
         }
+    } else {
+        document.getElementById("altura_field").style.display = "none";
+        document.getElementById("name_field").style.display = "none"
+        document.getElementById("peso_field").style.display = "none"
     }
 });

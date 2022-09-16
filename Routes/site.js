@@ -51,27 +51,14 @@ router.get('/perfil', utils.verifyJWT, async (req, res, next) => {
 		name: user.nome_paciente,
 		altura: user.altura,
 		peso: user.peso,
-		imc: imc,
-		img: img
-    });
-
-})
-
-//Rota para quantos pontos tem 
-router.get('/pontos', utils.verifyJWT, async(req, res, next) => {
-
-	const user = req.user;
- 
-	//Imprimir no HTML 
-	res.render("pontos", {
-        title: "Cal - Pontos",
-		name: user.nome_paciente,
-		altura: user.altura,
-		peso: user.peso,
 		peso_anterior: utils.getLast(user.peso_anterior, user.peso).peso,
+		imc: imc,
+		img: img,
 		pontos: user.pontos
     });
+
 })
+
 
 //Rota para troca de pontos
 router.get('/trocadepontos', utils.verifyJWT, async(req, res, next) => {
@@ -142,7 +129,8 @@ router.get('/graficos', utils.verifyJWT, async(req, res, next) => {
 								color: "rgba(255,99,132,0.2)"
 						 	},
 							ticks: {
-								beginAtZero: true
+								beginAtZero: true,
+								stepSize: 10
 							}
 						}],
 						xAxes: [{
@@ -152,18 +140,19 @@ router.get('/graficos', utils.verifyJWT, async(req, res, next) => {
 							},
 							ticks: {
 								beginAtZero: true,
-								max: 13,
-								min: 0
+								suggestedMax: 13,
+								suggestedMin: 0
 							}
 					   }],
 					   y: {
 							stacked: true,
+							stepSize: 10
 					   },
 					   x: {
 							type: 'category',
 							labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out',  'Nov', 'Dez'],
-							min: 0,
-                			max: 13
+							suggestedMin: 0,
+                			suggestedMax: 13
 					   }
 					 },
 					 elements: {
