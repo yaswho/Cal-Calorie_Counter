@@ -25,7 +25,14 @@
     </div>
     <div class="card-footer">
       <div class="d-grid gap-2 col-6 mx-auto">
-        <a href="/site/graficos" class="btn btn-primary">750 pontos</a>
+        <form action="/api/gastar" method="post">
+          <% if(pontos >= 750) { %>
+            <input type="hidden" name="amount" value="750">
+            <button class="btn btn-primary" type="submit">750 pontos</button>
+          <% } else { %>
+            <button class="btn btn-primary" disabled>750 pontos</button>
+          <% } %>
+        </form>
       </div>
     </div>
     </div>
@@ -38,7 +45,14 @@
     </div>
     <div class="card-footer">
       <div class="d-grid gap-2 col-6 mx-auto">
-        <a href="/site/graficos" class="btn btn-primary">100 pontos</a>
+        <form action="/api/amor" method="post">
+          <% if(pontos >= 100) { %>
+            <input type="hidden" name="amount" value="100">
+            <button class="btn btn-primary" type="submit">100 pontos</button>
+          <% } else { %>
+            <button class="btn btn-primary" disabled>100 pontos</button>
+          <% } %>
+        </form>
       </div>
     </div>
     </div>
@@ -50,7 +64,14 @@
     </div>
     <div class="card-footer">
       <div class="d-grid gap-2 col-6 mx-auto">
-        <a href="/site/graficos" class="btn btn-primary">500 pontos</a>
+        <form action="/api/usarpontos" method="post">
+          <% if(pontos >= 500) { %>
+            <input type="hidden" name="amount" value="500">
+            <button class="btn btn-primary" type="submit">500 pontos</button>
+          <% } else { %>
+            <button class="btn btn-primary" name="amount" value="500" disabled>500 pontos</button>
+          <% } %>
+        </form>
       </div>
     </div>
   </div>

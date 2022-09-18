@@ -61,6 +61,14 @@ const Paciente = db.define('Pacientes', {
     pontos: {
         type: Sequelize.INTEGER,
         defaultValue: 0
+    },
+    refreshToken: {
+        type: Sequelize.STRING,
+        defaultValue: ""
+    },
+    expiresIn: {
+        type: Sequelize.BIGINT.UNSIGNED,
+        defaultValue: 0
     }
 });
 

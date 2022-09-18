@@ -5,6 +5,7 @@ var jwt = require('jsonwebtoken');
 const Paciente = require('../models/Paciente');
 const { v4: uuidv4 } = require('uuid');
 const url = require('url');  
+const path = require('path');
 
 //Função para criar transportador 
 const transporter = nodemailer.createTransport({
@@ -126,6 +127,7 @@ class Utils {
 	  	return (peso - peso_anterior)*weight;	
 	}
 	
+	
 	encrypt(data, timeInMinutes)
 	{
 		var privateKey  = fs.readFileSync(`${__dirname}/private/private.pem`, {encoding: 'utf8', flag:'r'});
@@ -139,7 +141,7 @@ class Utils {
 
 	decrypt(data)
 	{
-	  var publicKey  = fs.readFileSync(`${__dirname}/private/public.pem`, {encoding: 'utf8', flag:'r'});
+	  var publicKey = fs.readFileSync(`${__dirname}/private/public.pem`, {encoding: 'utf8', flag:'r'});
 	  var decoded = jwt.verify(data, publicKey, {algorithm: ["RS256"]});
 	  return decoded.data; 
 	}
@@ -147,7 +149,7 @@ class Utils {
 	setCookie(res, name, data, timeInMinutes)
 	{
 		res.cookie(name, data, {
-		  maxAge: timeInMinutes * 6000, // maxAge:0 => sessão
+		  maxAge: timeInMinutes * 60000, // maxAge:0 => sessão
 		  //secure: true,
 		  httpOnly: true,
 		  sameSite: 'lax'
@@ -188,42 +190,61 @@ class Utils {
 		return dec.split('&')[1];
 	}
 	
-	async verifyJWT(req, res, next) { 
-		var authHeader = req.headers.authorization;
-
-		if (!authHeader) 
+	async verifyJWT(req, res, next) 
+	{ 
+		console.log("Verificando")
+		if(req.cookies)
 		{
-			if(Object.keys(req.cookies).includes("token")) 
+			if(Object.keys(req.cookies).includes("token"))
 			{
-				authHeader = `Auth ${req.cookies.token}`;
-			} else return res.status(401).send({ auth: false, message: 'Token não informado ou expirado.' });
-		}			 
+				console.log("tem token")
+				const token = utils.decrypt(req.cookies.token)
+				console.log("decriptou")
+				const users = await Paciente.findAll({
+					where: {
+					  uuid: token.split('&')[1]
+					 }
+					}); 
+				console.log(`procurando um tal de ${token.split('&')[1]}`)
+				if(Object.keys(users).length > 0) {
+					req.user = users[0];
+					if(req.user.peso_anterior !== '' && req.user.peso_anterior !== 'undefined')
+					{
+						req.user.peso_anterior = JSON.parse(req.user.peso_anterior);
+					}
+					if(req.user.altura_anterior !== '' && req.user.altura_anterior !== 'undefined')
+					{
+						req.user.altura_anterior = JSON.parse(req.user.altura_anterior);
+					}
+					next();
+				} //else res.redirect("../site/login")
+				console.log("amada?")
+			} else if(Object.keys(req.cookies).includes("refresh") && req.cookies.refresh) {
+				console.log("Num tem token")
+				console.log(`procurando um refresh token assim ${req.cookies.refresh}`)
+				const users = await Paciente.findAll({
+					attributes: ['email', 'uuid', 'expiresIn'],
+					where: {
+						refreshToken: req.cookies.refresh
+					}
+				}); 
+				console.log("vendo se tem")
+				if(Object.keys(users).length > 0)
+				{
+					const user = users[0].dataValues;
+					console.log("achou")
+					if(user.expiresIn >= Date.now())
+					{
+						console.log("renovou")
+						utils.grantToken(res, user);
+						await utils.grantRefreshToken(res, user);
+						// await utils.verifyJWT(req, res, next);
+						next();
+					} else res.redirect("../site/login")
 
-		const _token = authHeader.split(' ')[1];
-		const token = utils.decrypt(_token);
-
-		if (!token) {
-			return res.sendStatus(403);
+				} else res.redirect("../site/login")
+			}
 		}
-
-		const users = await Paciente.findAll({
-			where: {
-			  uuid: token.split('&')[1]
-			 }
-			}); 
-		
-		if(Object.keys(users).length > 0) {
-			req.user = users[0];
-			if(req.user.peso_anterior !== '' && req.user.peso_anterior !== 'undefined')
-			{
-				req.user.peso_anterior = JSON.parse(req.user.peso_anterior);
-			}
-			if(req.user.altura_anterior !== '' && req.user.altura_anterior !== 'undefined')
-			{
-				req.user.altura_anterior = JSON.parse(req.user.altura_anterior);
-			}
-			next();
-		} else res.sendStatus(401);
 	}
 
 	async hasUUID(token) 
@@ -403,15 +424,17 @@ class Utils {
 
 	async canRedirect(req)
 	{
-		var t;
+		var t = true;
 
-		if(utils.hasCookie(req, 'token'))
+		if(req.cookies)
 		{
-			if(req.cookies.token === 'undefined' || req.cookies.token === '') return;
-			var has = await utils.hasUUID(req.cookies.token)
-			if(has)
+			if(req.cookies.token)
 			{
-				t = true;
+				var has = await utils.hasUUID(req.cookies.token)
+				if(has)
+				{
+					t = false;
+				}
 			}
 		}
 
@@ -436,8 +459,40 @@ class Utils {
 		return `${date}/${month}/${year}`;
 	  }
 
-}
+	  grantToken(res, user)
+	  {
+		const token = utils.encrypt(`${user.email}&${user.uuid}`, 20);
+		utils.setCookie(res, "token", token, 20);
+	  }
 
+	  async grantRefreshToken(res, user)
+	  {
+		var date = Date.now();
+		var expires = date + 3600000*24*3;
+		var privateKey = await fs.promises.readFile(`${__dirname}/private/privateR.pem`, 'utf8', (err) => {
+			if(err) console.log(err)
+		});
+		const dt = `${user.email}&${user.uuid}&${date}`;
+
+		const token = jwt.sign({ dt }, {key: privateKey, passphrase: process.env.REFRESH_PASSPHRASE }, { 
+			expiresIn: 259200, // tempo em segundos 
+			algorithm:  "RS256" //SHA-256 hash signature
+		});
+
+		utils.setCookie(res, "refresh", token, 4320)
+
+		await Paciente.update({ refreshToken: token.toString(), expiresIn: expires }, {
+			where: {
+				uuid: user.uuid
+			}
+		});
+
+		return { refreshToken: token, date: date, expiresIn: expires }
+	  }
+
+}
+//cortou tudo kkk
+ 
 function bissex(year)
 {
 	return (year % 100 === 0) ? (year % 400 === 0) : (year % 4 === 0);

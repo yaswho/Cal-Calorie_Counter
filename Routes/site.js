@@ -30,7 +30,7 @@ router.get('/login', async (req,res) => {
 
 	res.render("login", {
         title: "Cal - Login",
-		token: t
+		token: !t
     });
 })
 
@@ -83,13 +83,13 @@ router.get('/graficos', utils.verifyJWT, async(req, res, next) => {
 	const user = req.user;
 
 
-		const width = 600; //px
-		const height = 400; //px
+		const width = 1280; //px
+		const height = 720; //px
 		const backgroundColour = 'white'; // Uses https://www.w3schools.com/tags/canvas_fillstyle.asp
 		const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour });
 
 		const data = {
-			labels: [1,2,3,4,5,6,7,8,9,10,11,12,13],
+			labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
 			datasets: [{
 			  label: ' Desempenho de peso',
 			  data: utils.datalize(user),
@@ -106,6 +106,7 @@ router.get('/graficos', utils.verifyJWT, async(req, res, next) => {
 				type: 'scatter',
 				data: data,
 				options: {
+					scaleShowValues: true,
 					plugins: {
 						display: true,
 						legend: true,
@@ -115,44 +116,60 @@ router.get('/graficos', utils.verifyJWT, async(req, res, next) => {
 						},
 						tooltip: {
 							callbacks: {
-								label: function(ctx)  {
+								label: ctx => {
 									console.log(ctx)
-									return "ctx"
+									return ctx
 								}
 							}
 						}
 					},
 					scales: {
-						yAxes: [{
-							gridLines: {
-								display: true,
-								color: "rgba(255,99,132,0.2)"
-						 	},
-							ticks: {
-								beginAtZero: true,
-								stepSize: 10
-							}
-						}],
-						xAxes: [{
-							gridLines: {
-								display: true,
-								color: "rgba(255,99,132,0.2)",
-							},
-							ticks: {
-								beginAtZero: true,
-								suggestedMax: 13,
-								suggestedMin: 0
-							}
-					   }],
+					// 	yAxes: [{
+					// 		gridLines: {
+					// 			display: true,
+					// 			color: "rgba(255,99,132,0.2)"
+					// 	 	},
+					// 		ticks: {
+					// 			beginAtZero: true,
+					// 			stepSize: 10
+					// 		}
+					// 	}],
+					// 	xAxes: [{
+					// 		gridLines: {
+					// 			display: true,
+					// 			color: "rgba(255,99,132,0.2)",
+					// 		},
+					// 		ticks: {
+					// 			beginAtZero: true,
+					// 			suggestedMax: 13,
+					// 			suggestedMin: 0,
+					// 			stepSize: 0.01
+					// 		}
+					//    }],
 					   y: {
 							stacked: true,
-							stepSize: 10
+							ticks: {
+								stepSize: 2
+							},
+							title: {
+								display: true,
+								text: "Massa (Kg)"
+							}
 					   },
 					   x: {
-							type: 'category',
-							labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out',  'Nov', 'Dez'],
+							// type: 'category',
+							// labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out',  'Nov', 'Dez'],
 							suggestedMin: 0,
-                			suggestedMax: 13
+                			suggestedMax: 13,
+							title: {
+								display: true,
+								text: "Tempo"
+							},
+							ticks: {
+								autoSkip: false,
+  								callback: value => value % 2 == 0 ? "dd" : null,
+								stepSize: 0.01,
+							}
 					   }
 					 },
 					 elements: {

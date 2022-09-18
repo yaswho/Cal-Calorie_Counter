@@ -162,24 +162,26 @@ router.post('/login', async(req, res) => {
 		return;
 	}
 
-	const token = utils.encrypt(`${users[0].dataValues.email}&${users[0].dataValues.uuid}`, 24*60);
-	utils.setCookie(res, "token", token, 24*60);
-
+	utils.grantToken(res, users[0].dataValues);
+	await utils.grantRefreshToken(res, users[0].dataValues);
 	res.redirect('../site/perfil');
 });
 
 //Função de logout 
 router.post('/logout', async(req, res, next) => {
 	utils.deleteCookie(res, 'token');
+	utils.deleteCookie(res, 'refresh');
 	res.end();
 });
 
 //funnção para mostrar os dados do banco 
 router.get('/teste', async(req, res) => {
 	
-	Paciente.findAll().then(function(infos){
-		res.render('teste', {infos: infos});
-	}) 
+	// Paciente.findAll().then(function(infos){
+	// 	res.render('teste', {infos: infos});
+	// })
+	
+	res.send(200)
 		
 });
 
@@ -250,9 +252,6 @@ router.post('/atualizarDados', utils.verifyJWT, async(req, res, next) => {
 
 		const pts = parseInt(user.pontos) + utils.calcularPontos(user, req.body.update_peso, peso_anterior);
 
-		console.log("pts")
-		console.log(parseInt(user.pontos))
-
 		await Paciente.update({ pontos: pts }, {
 			where: {
 				uuid: user.uuid
@@ -309,10 +308,73 @@ router.post('/uploadImage', utils.verifyJWT, upload.single('imagem'), async(req,
 		"O arquivo foi enviado com sucesso.",
 		"success-1",
 		"testecheck.jpeg",
+		true);
+
+	res.redirect(query);
+});
+
+//Rota de troca de pontos 
+router.post('/usarpontos'), utils.verifyJWT, async(req, res, next) => {
+
+	const user = req.user;
+	var amount = (Number.isInteger(req.body.amount)) ? req.body.amount : parseInt(req.body.amount);
+	var isoff = await utils.canRedirect(req);
+	const pts = user.pontos - amount;
+
+	await Paciente.update({ pontos: pts },
+	{
+		where: {
+			uuid: req.user.uuid
+		}
+	});
+
+	const query = utils.createURLFeedback("Cal - Feedback",
+		"Sucesso ao enviar.",
+		"O arquivo foi enviado com sucesso.",
+		"success-1",
+		"testecheck.jpeg",
 		isoff);
 
 	res.redirect(query);
-})
+
+	res.redirect('../site/perfil');
+}
+
+router.post('/gastar', utils.verifyJWT, async(req, res) => {
+	const user = req.user;
+	var amount = (Number.isInteger(req.body.amount)) ? req.body.amount : parseInt(req.body.amount);
+
+	if(user.pontos - amount < 0)
+	{
+		const query = utils.createURLFeedback("Cal - Feedback",
+			"Erro ao trocar",
+			`Erro`,
+			"error-1",
+			"erro.png");
+
+		res.redirect(query);
+		return;
+	}
+
+	var isoff = await utils.canRedirect(req);
+	const pts = user.pontos - amount;
+
+	await Paciente.update({ pontos: pts },
+	{
+		where: {
+			uuid: req.user.uuid
+		}
+	});
+
+	const query = utils.createURLFeedback("Cal - Feedback",
+		"Sucesso ao enviar.",
+		"O arquivo foi enviado com sucesso.",
+		"success-1",
+		"testecheck.jpeg",
+		isoff);
+
+	res.redirect(query);
+});
 
 //Exportando router
 module.exports = router;
