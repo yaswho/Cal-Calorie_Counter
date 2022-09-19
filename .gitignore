@@ -107,5 +107,5 @@ dist
 timing/
 keys/
 utils/private/
-public/uploads/*
+/public/uploads/**/*
 resources/
