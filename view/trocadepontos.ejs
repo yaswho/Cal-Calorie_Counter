@@ -45,7 +45,7 @@
     </div>
     <div class="card-footer">
       <div class="d-grid gap-2 col-6 mx-auto">
-        <form action="/api/amor" method="post">
+        <form action="/api/gastar" method="post">
           <% if(pontos >= 100) { %>
             <input type="hidden" name="amount" value="100">
             <button class="btn btn-primary" type="submit">100 pontos</button>
@@ -64,7 +64,7 @@
     </div>
     <div class="card-footer">
       <div class="d-grid gap-2 col-6 mx-auto">
-        <form action="/api/usarpontos" method="post">
+        <form action="/api/gastar" method="post">
           <% if(pontos >= 500) { %>
             <input type="hidden" name="amount" value="500">
             <button class="btn btn-primary" type="submit">500 pontos</button>

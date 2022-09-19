@@ -53,6 +53,11 @@ class Utils {
 			to: userMail,
 			subject: subject,
 			html: content,
+			attachments: [{
+				filename: 'apple1.png',
+				path: `${path.join(__dirname, '../')}/public/imgs/apple1.png`,
+				cid: 'logo'
+			}],
 		  };
 		
 		transporter.sendMail(mailOptions, function(error, info){
@@ -131,10 +136,19 @@ class Utils {
 	encrypt(data, timeInMinutes)
 	{
 		var privateKey  = fs.readFileSync(`${__dirname}/private/private.pem`, {encoding: 'utf8', flag:'r'});
-		var encrypted = jwt.sign({ data }, {key: privateKey, passphrase: process.env.PASSPHRASE }, { 
-			expiresIn: timeInMinutes*60, // tempo em segundos 
-			algorithm:  "RS256" //SHA-256 hash signature
-		}); 
+		var encrypted;
+
+		if(timeInMinutes > 0)
+		{
+			encrypted = jwt.sign({ data }, {key: privateKey, passphrase: process.env.PASSPHRASE }, { 
+				expiresIn: timeInMinutes*60, // tempo em segundos 
+				algorithm:  "RS256" //SHA-256 hash signature
+			}); 	
+		} else {
+			encrypted = jwt.sign({ data }, {key: privateKey, passphrase: process.env.PASSPHRASE }, { 
+				algorithm:  "RS256" //SHA-256 hash signature
+			}); 
+		}
 
 	  	return encrypted;
 	}
@@ -489,6 +503,39 @@ class Utils {
 
 		return { refreshToken: token, date: date, expiresIn: expires }
 	  }
+
+	  readEmail(name, replaces)
+	  {
+		var email  = fs.readFileSync(`${path.join(__dirname, '../')}/public/emails/${name}.html`, {encoding: 'utf8', flag:'r'});
+
+		for(var k = 0; k < Object.keys(replaces).length; k++)
+		{
+			let search = Object.keys(replaces)[k];
+
+			if(!search.startsWith("{{")) search = "{{" + search;
+			if(!search.endsWith("}}")) search = search + "}}";
+
+			const searchRegExp = new RegExp(search, 'g');
+			const replaceWith = replaces[Object.keys(replaces)[k]];
+
+			email = email.replace(searchRegExp, replaceWith);
+		}
+
+		email = email.replace(new RegExp("{{(.+)*}}", 'g'), "");
+
+		return email;
+	  }
+
+	  randomString(length) {
+			var result           = '';
+			var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+			var charactersLength = characters.length;
+			for ( var i = 0; i < length; i++ ) {
+				result += characters.charAt(Math.floor(Math.random() * 
+			charactersLength));
+			}
+			return result;
+		}
 
 }
 //cortou tudo kkk

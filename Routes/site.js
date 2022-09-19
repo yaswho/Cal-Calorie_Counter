@@ -6,6 +6,11 @@ const Chronos = require('./../Utils/Chronos');
 const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 const chartJSNodeCanvas = new ChartJSNodeCanvas({ type: 'svg', width: 800, height: 600 }); 
 
+function isMonth(value)
+{
+	return Object.keys(months).includes(value);
+}
+
 router.get('/', async (req,res) => {
 
 	var isoff = await utils.canRedirect(req);
@@ -82,9 +87,23 @@ router.get('/graficos', utils.verifyJWT, async(req, res, next) => {
 
 	const user = req.user;
 
+	const months = {
+		1: "Jan",
+		2: "Fev",
+		3: "Mar",
+		4: "Abr",
+		5: "Mai",
+		6: "Jun",
+		7: "Jul",
+		8: "Ago",
+		9: "Set",
+		10: "Out",
+		11: "Nov",
+		12: "Dez",
+	}
 
-		const width = 1280; //px
-		const height = 720; //px
+		const width = 1280/2; //px
+		const height = 720/2; //px
 		const backgroundColour = 'white'; // Uses https://www.w3schools.com/tags/canvas_fillstyle.asp
 		const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour });
 
@@ -107,47 +126,37 @@ router.get('/graficos', utils.verifyJWT, async(req, res, next) => {
 				data: data,
 				options: {
 					scaleShowValues: true,
+					responsive: true,
+					showTooltips: true,
 					plugins: {
 						display: true,
 						legend: true,
 						title: {
 							display: true,
-							text: "EXEMPLO"
+							//text: "EXEMPLO"
 						},
 						tooltip: {
+							enabled: true,
 							callbacks: {
-								label: ctx => {
-									console.log(ctx)
-									return ctx
-								}
+								label: function(context) {
+									var label = context.dataset.label || '';
+
+									if (label) {
+										label += ': ';
+									}
+									if (context.parsed.y !== null) {
+										label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+									}
+									return "AMOR";
+                    			}
 							}
 						}
 					},
 					scales: {
-					// 	yAxes: [{
-					// 		gridLines: {
-					// 			display: true,
-					// 			color: "rgba(255,99,132,0.2)"
-					// 	 	},
-					// 		ticks: {
-					// 			beginAtZero: true,
-					// 			stepSize: 10
-					// 		}
-					// 	}],
-					// 	xAxes: [{
-					// 		gridLines: {
-					// 			display: true,
-					// 			color: "rgba(255,99,132,0.2)",
-					// 		},
-					// 		ticks: {
-					// 			beginAtZero: true,
-					// 			suggestedMax: 13,
-					// 			suggestedMin: 0,
-					// 			stepSize: 0.01
-					// 		}
-					//    }],
 					   y: {
 							stacked: true,
+							min: 10,
+							max: 300,
 							ticks: {
 								stepSize: 2
 							},
@@ -157,8 +166,6 @@ router.get('/graficos', utils.verifyJWT, async(req, res, next) => {
 							}
 					   },
 					   x: {
-							// type: 'category',
-							// labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out',  'Nov', 'Dez'],
 							suggestedMin: 0,
                 			suggestedMax: 13,
 							title: {
@@ -167,8 +174,8 @@ router.get('/graficos', utils.verifyJWT, async(req, res, next) => {
 							},
 							ticks: {
 								autoSkip: false,
-  								callback: value => value % 2 == 0 ? "dd" : null,
-								stepSize: 0.01,
+  								callback: value => Number.isInteger(value) ? months[value] : null,
+								stepSize: 0.1,
 							}
 					   }
 					 },

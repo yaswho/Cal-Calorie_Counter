@@ -2,28 +2,14 @@
 <%- include('navbar'); %>
 </br>
 
+
 <form action="/api/registrar" method="post">
     <h2>Finalizar cadastro</h2>
     <input type="password" name="password" id="password" class="form-control" placeholder="Senha" aria-label="Senha" required>
     <input type="password" name="passwordConfirm" id="confirm_password" class="form-control" placeholder="Confirmar senha" aria-label="Confirmar senha" required>
     <input type="hidden" name="session" value="<%= session %>">
-    <div class="d-grid gap-2"><button type="submit" class="btn btn-primary" style="max-width: 100%;">Enviar</button></div>
+    <div class="d-grid gap-2"><button type="submit" class="btn btn-primary" id="btn" style="max-width: 100%;">Enviar</button></div>
 </form>
 
-<script>
-    var password = document.getElementById("password"), 
-        confirm_password = document.getElementById("confirm_password");
-
-    function validatePassword(){
-    if(password.value != confirm_password.value) {
-            confirm_password.setCustomValidity("As senhas não coincidem.");
-        } else {
-            confirm_password.setCustomValidity('');
-        }
-    }
-
-    password.onchange = validatePassword;
-    confirm_password.onkeyup = validatePassword;
-</script>
-
+<script src="/public/js/registro.js"></script>
 <%- include('footer'); %>

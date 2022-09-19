@@ -9,7 +9,7 @@ const multer = require("multer");
 
 var multerStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
-		cb(null, "./resources/assets/uploads/");
+		cb(null, "./public/uploads/");
 	},	
 	filename: (req, file, cb) => {
 		cb(null, `${Date.now()}-image-${file.originalname}`);
@@ -64,18 +64,11 @@ router.post("/registrarPaciente", async(req, res)=> {
 	}
 	
 	var uuid = Chronos.checkEmail(req.body.email, req.body);
+	const email = utils.readEmail("cadastro", {link: `http://localhost:${process.env.PORT}/site/registro/${utils.encrypt(uuid, 60*24)}`});
 
 	utils.sendEmail(
 		req.body.email,
-		`<div style="padding: 5px; background-color: rgb(231, 231, 231); margin: 0px;">
-
-		<div style="padding-left: 20px;">
-		<h1 style="text-align: center; background-color: rgb(0, 128, 96); padding-top: 10px; padding-bottom: 10px;">Cadastro na Calorie Counter</h1></br>
-			<p>Você iniciou o cadastro na Calorie Counter, para terminar, <a href="http://localhost:${process.env.PORT}/site/registro/${utils.encrypt(uuid, 60*24)}">clique aqui</a>.</p>
-			<p>Obrigada pela preferência!</p></br></br>
-		</div>
-			
-		</div>`,
+		email,
 		"Confirme seu cadastro."
 	)
 
@@ -296,7 +289,7 @@ router.post('/uploadImage', utils.verifyJWT, upload.single('imagem'), async(req,
 		return;
 	}
 	
-	await Paciente.update({ imagem: `/resources/assets/uploads/${req.file.filename}` },
+	await Paciente.update({ imagem: `/public/uploads/${req.file.filename}` },
 	{
 		where: {
 			uuid: req.user.uuid
@@ -365,6 +358,13 @@ router.post('/gastar', utils.verifyJWT, async(req, res) => {
 			uuid: req.user.uuid
 		}
 	});
+
+	var code = utils.randomString(10)
+	utils.sendEmail(
+		user.email,
+		utils.readEmail(`codigodetroca`, {codigo: code}),
+		`Resgate de Pontos da CalorieCounter`
+	)
 
 	const query = utils.createURLFeedback("Cal - Feedback",
 		"Sucesso ao enviar.",
